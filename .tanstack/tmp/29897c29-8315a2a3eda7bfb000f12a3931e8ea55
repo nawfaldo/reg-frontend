@@ -24,15 +24,7 @@ import { Route as ClientCompanyCompanyNameRouteImport } from './routes/client/co
 import { Route as ClientCompaniesCreateRouteImport } from './routes/client/companies/create'
 import { Route as ClientCompanyCompanyNameSettingRouteImport } from './routes/client/company/$companyName/setting'
 import { Route as ClientCompanyCompanyNameBillingRouteImport } from './routes/client/company/$companyName/billing'
-import { Route as ClientCompanyCompanyNameMemberPermissionRouteImport } from './routes/client/company/$companyName/member/permission'
-import { Route as ClientCompanyCompanyNameMemberUserIndexRouteImport } from './routes/client/company/$companyName/member/user/index'
-import { Route as ClientCompanyCompanyNameMemberRoleIndexRouteImport } from './routes/client/company/$companyName/member/role/index'
-import { Route as ClientCompanyCompanyNameMemberUserCreateRouteImport } from './routes/client/company/$companyName/member/user/create'
-import { Route as ClientCompanyCompanyNameMemberRoleCreateRouteImport } from './routes/client/company/$companyName/member/role/create'
-import { Route as ClientCompanyCompanyNameMemberUserUserIdIndexRouteImport } from './routes/client/company/$companyName/member/user/$userId/index'
-import { Route as ClientCompanyCompanyNameMemberRoleRoleIdIndexRouteImport } from './routes/client/company/$companyName/member/role/$roleId/index'
-import { Route as ClientCompanyCompanyNameMemberUserUserIdEditRouteImport } from './routes/client/company/$companyName/member/user/$userId/edit'
-import { Route as ClientCompanyCompanyNameMemberRoleRoleIdEditRouteImport } from './routes/client/company/$companyName/member/role/$roleId/edit'
+import { Route as ClientCompanyCompanyNameMemberMemberIndexRouteImport } from './routes/client/company/$companyName/member/member/index'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -112,58 +104,10 @@ const ClientCompanyCompanyNameBillingRoute =
     path: '/billing',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
-const ClientCompanyCompanyNameMemberPermissionRoute =
-  ClientCompanyCompanyNameMemberPermissionRouteImport.update({
-    id: '/member/permission',
-    path: '/member/permission',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberUserIndexRoute =
-  ClientCompanyCompanyNameMemberUserIndexRouteImport.update({
-    id: '/member/user/',
-    path: '/member/user/',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberRoleIndexRoute =
-  ClientCompanyCompanyNameMemberRoleIndexRouteImport.update({
-    id: '/member/role/',
-    path: '/member/role/',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberUserCreateRoute =
-  ClientCompanyCompanyNameMemberUserCreateRouteImport.update({
-    id: '/member/user/create',
-    path: '/member/user/create',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberRoleCreateRoute =
-  ClientCompanyCompanyNameMemberRoleCreateRouteImport.update({
-    id: '/member/role/create',
-    path: '/member/role/create',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberUserUserIdIndexRoute =
-  ClientCompanyCompanyNameMemberUserUserIdIndexRouteImport.update({
-    id: '/member/user/$userId/',
-    path: '/member/user/$userId/',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute =
-  ClientCompanyCompanyNameMemberRoleRoleIdIndexRouteImport.update({
-    id: '/member/role/$roleId/',
-    path: '/member/role/$roleId/',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberUserUserIdEditRoute =
-  ClientCompanyCompanyNameMemberUserUserIdEditRouteImport.update({
-    id: '/member/user/$userId/edit',
-    path: '/member/user/$userId/edit',
-    getParentRoute: () => ClientCompanyCompanyNameRoute,
-  } as any)
-const ClientCompanyCompanyNameMemberRoleRoleIdEditRoute =
-  ClientCompanyCompanyNameMemberRoleRoleIdEditRouteImport.update({
-    id: '/member/role/$roleId/edit',
-    path: '/member/role/$roleId/edit',
+const ClientCompanyCompanyNameMemberMemberIndexRoute =
+  ClientCompanyCompanyNameMemberMemberIndexRouteImport.update({
+    id: '/member/member/',
+    path: '/member/member/',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
 
@@ -183,15 +127,7 @@ export interface FileRoutesByFullPath {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
-  '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
-  '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
-  '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
-  '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
-  '/client/company/$companyName/member/user': typeof ClientCompanyCompanyNameMemberUserIndexRoute
-  '/client/company/$companyName/member/role/$roleId/edit': typeof ClientCompanyCompanyNameMemberRoleRoleIdEditRoute
-  '/client/company/$companyName/member/user/$userId/edit': typeof ClientCompanyCompanyNameMemberUserUserIdEditRoute
-  '/client/company/$companyName/member/role/$roleId': typeof ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute
-  '/client/company/$companyName/member/user/$userId': typeof ClientCompanyCompanyNameMemberUserUserIdIndexRoute
+  '/client/company/$companyName/member/member': typeof ClientCompanyCompanyNameMemberMemberIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -209,15 +145,7 @@ export interface FileRoutesByTo {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
-  '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
-  '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
-  '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
-  '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
-  '/client/company/$companyName/member/user': typeof ClientCompanyCompanyNameMemberUserIndexRoute
-  '/client/company/$companyName/member/role/$roleId/edit': typeof ClientCompanyCompanyNameMemberRoleRoleIdEditRoute
-  '/client/company/$companyName/member/user/$userId/edit': typeof ClientCompanyCompanyNameMemberUserUserIdEditRoute
-  '/client/company/$companyName/member/role/$roleId': typeof ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute
-  '/client/company/$companyName/member/user/$userId': typeof ClientCompanyCompanyNameMemberUserUserIdIndexRoute
+  '/client/company/$companyName/member/member': typeof ClientCompanyCompanyNameMemberMemberIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -236,15 +164,7 @@ export interface FileRoutesById {
   '/client/profile/': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
-  '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
-  '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
-  '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
-  '/client/company/$companyName/member/role/': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
-  '/client/company/$companyName/member/user/': typeof ClientCompanyCompanyNameMemberUserIndexRoute
-  '/client/company/$companyName/member/role/$roleId/edit': typeof ClientCompanyCompanyNameMemberRoleRoleIdEditRoute
-  '/client/company/$companyName/member/user/$userId/edit': typeof ClientCompanyCompanyNameMemberUserUserIdEditRoute
-  '/client/company/$companyName/member/role/$roleId/': typeof ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute
-  '/client/company/$companyName/member/user/$userId/': typeof ClientCompanyCompanyNameMemberUserUserIdIndexRoute
+  '/client/company/$companyName/member/member/': typeof ClientCompanyCompanyNameMemberMemberIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -264,15 +184,7 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
-    | '/client/company/$companyName/member/permission'
-    | '/client/company/$companyName/member/role/create'
-    | '/client/company/$companyName/member/user/create'
-    | '/client/company/$companyName/member/role'
-    | '/client/company/$companyName/member/user'
-    | '/client/company/$companyName/member/role/$roleId/edit'
-    | '/client/company/$companyName/member/user/$userId/edit'
-    | '/client/company/$companyName/member/role/$roleId'
-    | '/client/company/$companyName/member/user/$userId'
+    | '/client/company/$companyName/member/member'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -290,15 +202,7 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
-    | '/client/company/$companyName/member/permission'
-    | '/client/company/$companyName/member/role/create'
-    | '/client/company/$companyName/member/user/create'
-    | '/client/company/$companyName/member/role'
-    | '/client/company/$companyName/member/user'
-    | '/client/company/$companyName/member/role/$roleId/edit'
-    | '/client/company/$companyName/member/user/$userId/edit'
-    | '/client/company/$companyName/member/role/$roleId'
-    | '/client/company/$companyName/member/user/$userId'
+    | '/client/company/$companyName/member/member'
   id:
     | '__root__'
     | '/'
@@ -316,15 +220,7 @@ export interface FileRouteTypes {
     | '/client/profile/'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
-    | '/client/company/$companyName/member/permission'
-    | '/client/company/$companyName/member/role/create'
-    | '/client/company/$companyName/member/user/create'
-    | '/client/company/$companyName/member/role/'
-    | '/client/company/$companyName/member/user/'
-    | '/client/company/$companyName/member/role/$roleId/edit'
-    | '/client/company/$companyName/member/user/$userId/edit'
-    | '/client/company/$companyName/member/role/$roleId/'
-    | '/client/company/$companyName/member/user/$userId/'
+    | '/client/company/$companyName/member/member/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -445,67 +341,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientCompanyCompanyNameBillingRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
-    '/client/company/$companyName/member/permission': {
-      id: '/client/company/$companyName/member/permission'
-      path: '/member/permission'
-      fullPath: '/client/company/$companyName/member/permission'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberPermissionRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/user/': {
-      id: '/client/company/$companyName/member/user/'
-      path: '/member/user'
-      fullPath: '/client/company/$companyName/member/user'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberUserIndexRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/role/': {
-      id: '/client/company/$companyName/member/role/'
-      path: '/member/role'
-      fullPath: '/client/company/$companyName/member/role'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberRoleIndexRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/user/create': {
-      id: '/client/company/$companyName/member/user/create'
-      path: '/member/user/create'
-      fullPath: '/client/company/$companyName/member/user/create'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberUserCreateRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/role/create': {
-      id: '/client/company/$companyName/member/role/create'
-      path: '/member/role/create'
-      fullPath: '/client/company/$companyName/member/role/create'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberRoleCreateRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/user/$userId/': {
-      id: '/client/company/$companyName/member/user/$userId/'
-      path: '/member/user/$userId'
-      fullPath: '/client/company/$companyName/member/user/$userId'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberUserUserIdIndexRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/role/$roleId/': {
-      id: '/client/company/$companyName/member/role/$roleId/'
-      path: '/member/role/$roleId'
-      fullPath: '/client/company/$companyName/member/role/$roleId'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberRoleRoleIdIndexRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/user/$userId/edit': {
-      id: '/client/company/$companyName/member/user/$userId/edit'
-      path: '/member/user/$userId/edit'
-      fullPath: '/client/company/$companyName/member/user/$userId/edit'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberUserUserIdEditRouteImport
-      parentRoute: typeof ClientCompanyCompanyNameRoute
-    }
-    '/client/company/$companyName/member/role/$roleId/edit': {
-      id: '/client/company/$companyName/member/role/$roleId/edit'
-      path: '/member/role/$roleId/edit'
-      fullPath: '/client/company/$companyName/member/role/$roleId/edit'
-      preLoaderRoute: typeof ClientCompanyCompanyNameMemberRoleRoleIdEditRouteImport
+    '/client/company/$companyName/member/member/': {
+      id: '/client/company/$companyName/member/member/'
+      path: '/member/member'
+      fullPath: '/client/company/$companyName/member/member'
+      preLoaderRoute: typeof ClientCompanyCompanyNameMemberMemberIndexRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
   }
@@ -514,39 +354,15 @@ declare module '@tanstack/react-router' {
 interface ClientCompanyCompanyNameRouteChildren {
   ClientCompanyCompanyNameBillingRoute: typeof ClientCompanyCompanyNameBillingRoute
   ClientCompanyCompanyNameSettingRoute: typeof ClientCompanyCompanyNameSettingRoute
-  ClientCompanyCompanyNameMemberPermissionRoute: typeof ClientCompanyCompanyNameMemberPermissionRoute
-  ClientCompanyCompanyNameMemberRoleCreateRoute: typeof ClientCompanyCompanyNameMemberRoleCreateRoute
-  ClientCompanyCompanyNameMemberUserCreateRoute: typeof ClientCompanyCompanyNameMemberUserCreateRoute
-  ClientCompanyCompanyNameMemberRoleIndexRoute: typeof ClientCompanyCompanyNameMemberRoleIndexRoute
-  ClientCompanyCompanyNameMemberUserIndexRoute: typeof ClientCompanyCompanyNameMemberUserIndexRoute
-  ClientCompanyCompanyNameMemberRoleRoleIdEditRoute: typeof ClientCompanyCompanyNameMemberRoleRoleIdEditRoute
-  ClientCompanyCompanyNameMemberUserUserIdEditRoute: typeof ClientCompanyCompanyNameMemberUserUserIdEditRoute
-  ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute: typeof ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute
-  ClientCompanyCompanyNameMemberUserUserIdIndexRoute: typeof ClientCompanyCompanyNameMemberUserUserIdIndexRoute
+  ClientCompanyCompanyNameMemberMemberIndexRoute: typeof ClientCompanyCompanyNameMemberMemberIndexRoute
 }
 
 const ClientCompanyCompanyNameRouteChildren: ClientCompanyCompanyNameRouteChildren =
   {
     ClientCompanyCompanyNameBillingRoute: ClientCompanyCompanyNameBillingRoute,
     ClientCompanyCompanyNameSettingRoute: ClientCompanyCompanyNameSettingRoute,
-    ClientCompanyCompanyNameMemberPermissionRoute:
-      ClientCompanyCompanyNameMemberPermissionRoute,
-    ClientCompanyCompanyNameMemberRoleCreateRoute:
-      ClientCompanyCompanyNameMemberRoleCreateRoute,
-    ClientCompanyCompanyNameMemberUserCreateRoute:
-      ClientCompanyCompanyNameMemberUserCreateRoute,
-    ClientCompanyCompanyNameMemberRoleIndexRoute:
-      ClientCompanyCompanyNameMemberRoleIndexRoute,
-    ClientCompanyCompanyNameMemberUserIndexRoute:
-      ClientCompanyCompanyNameMemberUserIndexRoute,
-    ClientCompanyCompanyNameMemberRoleRoleIdEditRoute:
-      ClientCompanyCompanyNameMemberRoleRoleIdEditRoute,
-    ClientCompanyCompanyNameMemberUserUserIdEditRoute:
-      ClientCompanyCompanyNameMemberUserUserIdEditRoute,
-    ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute:
-      ClientCompanyCompanyNameMemberRoleRoleIdIndexRoute,
-    ClientCompanyCompanyNameMemberUserUserIdIndexRoute:
-      ClientCompanyCompanyNameMemberUserUserIdIndexRoute,
+    ClientCompanyCompanyNameMemberMemberIndexRoute:
+      ClientCompanyCompanyNameMemberMemberIndexRoute,
   }
 
 const ClientCompanyCompanyNameRouteWithChildren =

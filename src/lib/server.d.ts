@@ -33,6 +33,18 @@ declare const app: Elysia<"", {
     macroFn: {};
     parser: {};
 }, {
+    [x: string]: {
+        get: {
+            body: unknown;
+            params: {};
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: string;
+            };
+        };
+    };
+} & {
     api: {
         me: {
             get: {
@@ -73,14 +85,42 @@ declare const app: Elysia<"", {
         };
     };
 } & {
-    [x: string]: {
-        get: {
-            body: unknown;
-            params: {};
-            query: unknown;
-            headers: unknown;
-            response: {
-                200: string;
+    api: {
+        me: {
+            put: {
+                body: {
+                    name?: string | undefined;
+                    image?: string | undefined;
+                };
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: {
+                        error: string;
+                        user?: undefined;
+                    } | {
+                        user: {
+                            id: string;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            email: string;
+                            emailVerified: boolean;
+                            name: string;
+                            image: string | null;
+                        };
+                        error?: undefined;
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
             };
         };
     };
@@ -144,11 +184,13 @@ declare const app: Elysia<"", {
                         companies: {
                             isOwner: boolean;
                             role: string;
+                            permissions: string[];
                             hasActiveSubscription: boolean | "" | null;
                             id: string;
                             createdAt: Date;
                             updatedAt: Date;
                             name: string;
+                            image: string | null;
                             userId: string;
                             stripeSubscriptionId: string | null;
                             stripePriceId: string | null;
@@ -179,6 +221,7 @@ declare const app: Elysia<"", {
                                 createdAt: Date;
                                 updatedAt: Date;
                                 name: string;
+                                desc: string | null;
                             }[];
                             error?: undefined;
                         };
@@ -219,6 +262,50 @@ declare const app: Elysia<"", {
 } & {
     api: {
         company: {
+            name: {
+                ":name": {
+                    get: {
+                        body: unknown;
+                        params: {
+                            name: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                company?: undefined;
+                            } | {
+                                company: {
+                                    id: string;
+                                    name: string;
+                                    image: string | null;
+                                    isOwner: boolean;
+                                    roles: string[];
+                                    permissions: string[];
+                                    hasActiveSubscription: boolean | "" | null;
+                                    currentPeriodEnd: Date | null;
+                                };
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
             ":id": {
                 get: {
                     body: unknown;
@@ -234,16 +321,10 @@ declare const app: Elysia<"", {
                         } | {
                             company: {
                                 isOwner: boolean;
-                                role: string;
+                                roles: string[];
+                                permissions: string[];
                                 hasActiveSubscription: boolean | "" | null;
-                                members: {
-                                    role: string;
-                                    joinedAt: Date;
-                                    id: string;
-                                    email: string;
-                                    name: string;
-                                    image: string | null;
-                                }[];
+                                members: any[];
                                 users: ({
                                     user: {
                                         id: string;
@@ -266,6 +347,7 @@ declare const app: Elysia<"", {
                                 createdAt: Date;
                                 updatedAt: Date;
                                 name: string;
+                                image: string | null;
                                 userId: string;
                                 stripeCustomerId: string | null;
                                 stripeSubscriptionId: string | null;
@@ -293,6 +375,7 @@ declare const app: Elysia<"", {
         company: {
             post: {
                 body: {
+                    image?: string | undefined;
                     name: string;
                 };
                 params: {};
@@ -311,6 +394,7 @@ declare const app: Elysia<"", {
                             createdAt: Date;
                             updatedAt: Date;
                             name: string;
+                            image: string | null;
                             userId: string;
                             stripeCustomerId: string | null;
                             stripeSubscriptionId: string | null;
@@ -357,6 +441,7 @@ declare const app: Elysia<"", {
                                 createdAt: Date;
                                 updatedAt: Date;
                                 name: string;
+                                image: string | null;
                                 userId: string;
                                 stripeCustomerId: string | null;
                                 stripeSubscriptionId: string | null;
@@ -422,7 +507,7 @@ declare const app: Elysia<"", {
                     post: {
                         body: {
                             userId: string;
-                            roleId: string;
+                            roleIds: string[];
                         };
                         params: {
                             id: string;
@@ -557,6 +642,7 @@ declare const app: Elysia<"", {
                                     permissions: {
                                         id: string;
                                         name: string;
+                                        desc: string | null;
                                     }[];
                                 } & {
                                     id: string;
@@ -612,6 +698,7 @@ declare const app: Elysia<"", {
                                         permissions: {
                                             id: string;
                                             name: string;
+                                            desc: string | null;
                                         }[];
                                         id: string;
                                         createdAt: Date;
@@ -661,6 +748,7 @@ declare const app: Elysia<"", {
                                     permissions: {
                                         id: string;
                                         name: string;
+                                        desc: string | null;
                                     }[];
                                 } & {
                                     id: string;
@@ -712,6 +800,7 @@ declare const app: Elysia<"", {
                                         permissions: {
                                             id: string;
                                             name: string;
+                                            desc: string | null;
                                         }[];
                                     } & {
                                         id: string;

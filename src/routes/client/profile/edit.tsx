@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import CreateHeader from '../../../component/headers/CreateHeader'
-import { useRef, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Home, Camera } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect, useRef } from 'react'
+import { api } from '../../../lib/api'
+import { User, Camera } from 'lucide-react'
+import EditHeader from '../../../component/headers/EditHeader'
 
-export const Route = createFileRoute('/client/companies/create')({
+export const Route = createFileRoute('/client/profile/edit')({
   component: RouteComponent,
 })
 
@@ -14,7 +15,24 @@ function RouteComponent() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [name, setName] = useState('')
   const [image, setImage] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  const { data: userData, isLoading } = useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      const { data, error } = await api.api.me.get()
+      if (error) throw error
+      return data
+    },
+  })
+
+  useEffect(() => {
+    if (userData?.user && !isInitialized) {
+      setName(userData.user.name || '')
+      setImage(userData.user.image || '')
+      setIsInitialized(true)
+    }
+  }, [userData, isInitialized])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -45,64 +63,64 @@ function RouteComponent() {
     fileInputRef.current?.click()
   }
 
-  const createMutation = useMutation({
-    mutationFn: async (data: { name: string; image?: string }) => {
-      const response = await fetch('http://localhost:3000/api/company', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create company');
-      }
-
-      return response.json();
+  const updateMutation = useMutation({
+    mutationFn: async (data: { name?: string; image?: string }) => {
+      const { data: response, error } = await api.api.me.put(data)
+      if (error) throw error
+      return response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
-      navigate({ to: '/client/companies' });
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+      navigate({ to: '/client/profile' })
     },
-    onError: (err: Error) => {
-      setError(err.message);
-    },
-  });
+  })
 
-  const handleCreate = () => {
-    setError(null);
-
-    // Validate name
-    if (!name || name.trim().length === 0) {
-      setError('Nama perusahaan tidak boleh kosong');
-      return;
-    }
-
-    // Create company with optional image
-    const createData: { name: string; image?: string } = { name: name.trim() };
-    if (image && image.trim().length > 0) {
-      createData.image = image;
+  const handleSave = () => {
+    const updateData: { name?: string; image?: string } = {}
+    
+    if (name !== userData?.user?.name) {
+      updateData.name = name
     }
     
-    createMutation.mutate(createData);
+    if (image !== userData?.user?.image) {
+      updateData.image = image
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      updateMutation.mutate(updateData)
+    } else {
+      navigate({ to: '/client/profile' })
+    }
   }
+
+  if (isLoading) {
+    return (
+      <div className="p-6 h-full bg-white">
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!userData?.user) {
+    return (
+      <div className="p-6 h-full bg-white">
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-500">User not found</p>
+        </div>
+      </div>
+    )
+  }
+
 
   return (
     <div className="px-6 pt-1 h-full bg-white">
-      <CreateHeader
-        title="Buat Perusahaan" 
-        createHandle={handleCreate} 
+      <EditHeader
+        title="Ubah Profil" 
+        saveHandle={handleSave} 
       />
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
-
+      
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-bold text-black mb-3">
@@ -120,7 +138,7 @@ function RouteComponent() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Home className="w-12 h-12 text-gray-400" />
+                <User className="w-12 h-12 text-gray-400" />
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
                 <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
@@ -143,22 +161,11 @@ function RouteComponent() {
           <input
             type="text"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value)
-              setError(null)
-            }}
-            className={`w-full max-w-md px-3 py-2 border focus:outline-none text-sm ${
-              error && (!name || name.trim().length === 0)
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-gray-300 focus:border-gray-900'
-            }`}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full max-w-md px-3 py-2 border border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
           />
-          {error && (!name || name.trim().length === 0) && (
-            <p className="mt-1 text-xs text-red-600">Nama wajib diisi</p>
-          )}
         </div>
       </div>
-
     </div>
   )
 }
