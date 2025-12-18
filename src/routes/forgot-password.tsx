@@ -19,7 +19,7 @@ function ForgotPassword() {
     setIsLoading(true);
     const { error } = await authClient.requestPasswordReset({
       email,
-      redirectTo: "http://localhost:5173/reset-password",
+      redirectTo: "https://reg-frontend-seven.vercel.app/reset-password",
     });
 
     setIsLoading(false);
