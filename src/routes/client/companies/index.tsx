@@ -10,7 +10,7 @@ function RouteComponent() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
-      const response = await fetch('https://reg-backend-psi.vercel.app/api/company', {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company`, {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to fetch companies');

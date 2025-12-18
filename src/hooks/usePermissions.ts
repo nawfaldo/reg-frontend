@@ -6,7 +6,7 @@ export function usePermissions(companyName: string | undefined) {
     queryKey: ['company', companyName],
     queryFn: async () => {
       if (!companyName) return null;
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/name/${encodeURIComponent(companyName)}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
         credentials: 'include',
       });
       if (!response.ok) {

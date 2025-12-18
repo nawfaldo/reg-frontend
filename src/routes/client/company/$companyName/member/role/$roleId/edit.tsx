@@ -23,7 +23,7 @@ function RouteComponent() {
   const { data: companyData } = useQuery({
     queryKey: ['company', companyName],
     queryFn: async () => {
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/name/${encodeURIComponent(companyName)}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -39,7 +39,7 @@ function RouteComponent() {
     queryKey: ['company', companyData?.company?.id, 'roles', roleId],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/roles/${roleId}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles/${roleId}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -55,7 +55,7 @@ function RouteComponent() {
   const { data: permissionsData, isLoading: isLoadingPermissions } = useQuery({
     queryKey: ['permissions'],
     queryFn: async () => {
-      const response = await fetch('https://reg-backend-psi.vercel.app/api/company/permissions', {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/permissions`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -78,7 +78,7 @@ function RouteComponent() {
     mutationFn: async (data: { name: string; permissionIds?: string[] }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/roles/${roleId}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles/${roleId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

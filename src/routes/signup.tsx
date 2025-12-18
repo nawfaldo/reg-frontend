@@ -38,7 +38,7 @@ function SignUp() {
         email,
         password,
         name,
-        callbackURL: "https://reg-frontend-seven.vercel.app/email-verified",
+        callbackURL: `${import.meta.env.VITE_WEBSITE_URL}/email-verified`,
       },
       {
         onSuccess: () => {
@@ -57,7 +57,7 @@ function SignUp() {
     setIsLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "https://reg-frontend-seven.vercel.app",
+      callbackURL: `${import.meta.env.WEBSITE_URL}/client/dashboard`,
     });
   };
 

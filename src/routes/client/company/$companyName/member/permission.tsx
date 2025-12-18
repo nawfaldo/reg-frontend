@@ -15,7 +15,7 @@ function RouteComponent() {
   const { data: permissionsData, isLoading, error } = useQuery({
     queryKey: ['permissions'],
     queryFn: async () => {
-      const response = await fetch('https://reg-backend-psi.vercel.app/api/company/permissions', {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/permissions`, {
         credentials: 'include',
       });
       if (!response.ok) {

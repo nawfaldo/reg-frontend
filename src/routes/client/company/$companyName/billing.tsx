@@ -47,7 +47,7 @@ function RouteComponent() {
       if (!company) throw new Error("Company not found");
 
       const response = await fetch(
-        "https://reg-backend-psi.vercel.app/api/payment/create-checkout-session",
+        `${import.meta.env.VITE_SERVER_URL}/api/payment/create-checkout-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

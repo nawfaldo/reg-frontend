@@ -44,7 +44,7 @@ function Login() {
     setIsLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "https://reg-frontend-seven.vercel.app/client/dashboard",
+      callbackURL: `${import.meta.env.VITE_WEBSITE_URL}/client/dashboard`,
     });
   };
 

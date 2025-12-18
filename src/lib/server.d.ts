@@ -135,11 +135,11 @@ declare const app: Elysia<"", {
                     headers: unknown;
                     response: {
                         200: {
-                            error: string;
-                            url?: undefined;
-                        } | {
                             url: string | null;
                             error?: undefined;
+                        } | {
+                            error: any;
+                            url?: undefined;
                         };
                     };
                 };

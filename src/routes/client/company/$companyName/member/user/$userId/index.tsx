@@ -20,7 +20,7 @@ function RouteComponent() {
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: ['company', companyName],
     queryFn: async () => {
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/name/${encodeURIComponent(companyName)}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -36,7 +36,7 @@ function RouteComponent() {
     queryKey: ['company', companyData?.company?.id, 'members'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -52,7 +52,7 @@ function RouteComponent() {
     mutationFn: async () => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/members/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/members/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
