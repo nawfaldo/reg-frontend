@@ -20,9 +20,12 @@ function RouteComponent() {
   const { data: userData, isLoading } = useQuery({
     queryKey: ['me'],
     queryFn: async () => {
-      const { data, error } = await api.api.me.get()
-      if (error) throw error
-      return data
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/me`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch user data');
+      const data = await response.json();
+      return data;
     },
   })
 

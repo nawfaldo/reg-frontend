@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../lib/api";
 import { authClient } from "../../../lib/auth-client";
 
 export const Route = createFileRoute('/client/profile/')({
@@ -11,8 +10,11 @@ function RouteComponent() {
   const { data: userData, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data, error } = await api.api.me.get();
-      if (error) throw error;
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/me`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch user data');
+      const data = await response.json();
       return data;
     },
   });
