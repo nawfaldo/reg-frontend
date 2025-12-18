@@ -22,7 +22,7 @@ function RouteComponent() {
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: ['company', companyName],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:3000/api/company/name/${encodeURIComponent(companyName)}`, {
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/name/${encodeURIComponent(companyName)}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -38,7 +38,7 @@ function RouteComponent() {
     queryKey: ['company', companyData?.company?.id, 'members'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`http://localhost:3000/api/company/${companyData.company.id}`, {
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -55,7 +55,7 @@ function RouteComponent() {
     queryKey: ['company', companyData?.company?.id, 'roles'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`http://localhost:3000/api/company/${companyData.company.id}/roles`, {
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/roles`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -82,7 +82,7 @@ function RouteComponent() {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
       // Delete all existing UserCompany records for this user
-      const existingRecords = await fetch(`http://localhost:3000/api/company/${companyData.company.id}/members/${userId}`, {
+      const existingRecords = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/members/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -94,7 +94,7 @@ function RouteComponent() {
 
       // Add new roles
       if (data.roleIds.length > 0) {
-        const response = await fetch(`http://localhost:3000/api/company/${companyData.company.id}/members`, {
+        const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/${companyData.company.id}/members`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

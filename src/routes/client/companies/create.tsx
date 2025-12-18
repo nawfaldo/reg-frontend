@@ -47,7 +47,7 @@ function RouteComponent() {
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; image?: string }) => {
-      const response = await fetch('http://localhost:3000/api/company', {
+      const response = await fetch('https://reg-backend-psi.vercel.app/api/company', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

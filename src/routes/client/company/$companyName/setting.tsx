@@ -12,7 +12,7 @@ function RouteComponent() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['company', companyName],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:3000/api/company/name/${encodeURIComponent(companyName)}`, {
+      const response = await fetch(`https://reg-backend-psi.vercel.app/api/company/name/${encodeURIComponent(companyName)}`, {
         credentials: 'include',
       });
       if (!response.ok) {
