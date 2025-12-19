@@ -314,14 +314,11 @@ function GeoJSONLayer({ data }: { data: any }) {
                 style={{ height: '100%', width: '100%' }}
                 scrollWheelZoom={true}
               >
+                {/* Menggunakan Google Satellite Hybrid (Foto + Jalan) */}
                 <TileLayer
-                  attribution='Tiles &copy; Esri'
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                />
-                <TileLayer
-                  attribution='&copy; OpenStreetMap'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  opacity={0.4}
+                  attribution='&copy; Google Maps'
+                  url="http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}"
+                  maxZoom={20}
                 />
                 {geoJsonData && (
                   <>
