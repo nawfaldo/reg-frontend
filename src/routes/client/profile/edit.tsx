@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect, useRef } from 'react'
-import { api } from '../../../lib/api'
+import { server } from '../../../lib/api'
+import { queryKeys } from '../../../lib/query-keys'
 import { User, Camera } from 'lucide-react'
 import EditHeader from '../../../component/headers/EditHeader'
 
@@ -18,16 +19,13 @@ function RouteComponent() {
   const [isInitialized, setIsInitialized] = useState(false)
 
   const { data: userData, isLoading } = useQuery({
-    queryKey: ['me'],
+    queryKey: queryKeys.me,
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/me`, {
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch user data');
-      const data = await response.json();
+      const { data, error } = await server.api.me.get();
+      if (error) throw error;
       return data;
     },
-  })
+  });
 
   useEffect(() => {
     if (userData?.user && !isInitialized) {
@@ -68,12 +66,12 @@ function RouteComponent() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: { name?: string; image?: string }) => {
-      const { data: response, error } = await api.api.me.put(data)
+      const { data: response, error } = await server.api.me.put(data)
       if (error) throw error
       return response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['me'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.me })
       navigate({ to: '/client/profile' })
     },
   })

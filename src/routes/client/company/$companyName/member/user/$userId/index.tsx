@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Eye } from 'lucide-react'
 import DetailHeader from '../../../../../../../component/headers/DetailHeader'
 import { usePermissions } from '../../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../../lib/api'
+import { queryKeys } from '../../../../../../../lib/query-keys'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/member/user/$userId/',
@@ -18,32 +20,22 @@ function RouteComponent() {
 
   // Fetch company ID
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   // Fetch company members to get user details
   const { data: membersData, isLoading: isLoadingMembers, error } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'members'],
+    queryKey: companyData?.company?.id ? queryKeys.company.members(companyData.company.id) : ['company', companyData?.company?.id, 'members'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch members');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });
@@ -52,20 +44,17 @@ function RouteComponent() {
     mutationFn: async () => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/members/${userId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete member');
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).members({ userId }).delete();
+      if (error) throw error;
+      if ('error' in data && data.error) {
+        throw new Error((data.error as any).value?.error || 'Failed to delete member');
       }
-
-      return response.json();
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company', companyData?.company?.id, 'members'] });
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.members(companyData.company.id) });
+      }
       navigate({ to: '/client/company/$companyName/member/user', params: { companyName } });
     },
     onError: (err: Error) => {

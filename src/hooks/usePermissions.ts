@@ -1,18 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { hasPermission } from '../lib/permissions'
+import { server } from '../lib/api'
+import { queryKeys } from '../lib/query-keys'
 
 export function usePermissions(companyName: string | undefined) {
   const { data: companyData } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: companyName ? queryKeys.company.byName(companyName) : ['company', companyName],
     queryFn: async () => {
       if (!companyName) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        return null;
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) return null;
+      return data;
     },
     enabled: !!companyName,
   });

@@ -3,6 +3,8 @@ import CreateHeader from '../../../component/headers/CreateHeader'
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Home, Camera } from 'lucide-react'
+import { server } from '../../../lib/api'
+import { queryKeys } from '../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/companies/create')({
   component: RouteComponent,
@@ -47,24 +49,12 @@ function RouteComponent() {
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; image?: string }) => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create company');
-      }
-
-      return response.json();
+      const { data: response, error } = await server.api.company.post(data);
+      if (error) throw error;
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.company.companies });
       navigate({ to: '/client/companies' });
     },
     onError: (err: Error) => {

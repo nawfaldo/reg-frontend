@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2, CheckCircle2, Building2, ArrowRight, TriangleAlert } from 'lucide-react'
+import { server } from '../../../../lib/api'
+import { queryKeys } from '../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/setting')({
   component: RouteComponent,
@@ -10,16 +12,11 @@ function RouteComponent() {
   const { companyName } = useParams({ from: '/client/company/$companyName/setting' })
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 

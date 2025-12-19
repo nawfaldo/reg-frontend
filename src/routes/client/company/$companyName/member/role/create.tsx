@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { ChevronDown, X } from 'lucide-react'
 import CreateHeader from '../../../../../../component/headers/CreateHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../lib/api'
+import { queryKeys } from '../../../../../../lib/query-keys'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/member/role/create',
@@ -23,31 +25,21 @@ function RouteComponent() {
 
   // Fetch company ID
   const { data: companyData } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   // Fetch permissions
   const { data: permissionsData, isLoading: isLoadingPermissions } = useQuery({
-    queryKey: ['permissions'],
+    queryKey: queryKeys.company.permissions,
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/permissions`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch permissions');
-      }
-      return response.json();
+      const { data, error } = await server.api.company.permissions.get();
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -55,24 +47,17 @@ function RouteComponent() {
     mutationFn: async (data: { name: string; permissionIds?: string[] }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create role');
+      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).roles.post(data);
+      if (error) throw error;
+      if ('error' in response && response.error) {
+        throw new Error((response.error as any).value?.error || 'Failed to create role');
       }
-
-      return response.json();
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company', companyData?.company?.id, 'roles'] });
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.roles(companyData.company.id) });
+      }
       navigate({ to: '/client/company/$companyName/member/role', params: { companyName } });
     },
     onError: (err: Error) => {

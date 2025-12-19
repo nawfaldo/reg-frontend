@@ -1,8 +1,10 @@
 import { createFileRoute, Outlet, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User, Settings, Building2, Loader2 } from 'lucide-react'
+import { Search, User, Settings, Building2, Loader2, MapPin } from 'lucide-react'
 import { useState } from 'react'
 import { usePermissions } from '../../../hooks/usePermissions'
+import { server } from '../../../lib/api'
+import { queryKeys } from '../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName')({
   component: RouteComponent,
@@ -13,16 +15,11 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -105,6 +102,14 @@ function RouteComponent() {
 
         {/* Menu Items */}
         <nav className="flex-1 space-y-2 px-4 pt-4">
+          <Link
+            to="/client/company/$companyName/geo-tag"
+            params={{ companyName: company.name }}
+            className="flex items-center gap-3 text-sm text-black mb-5"
+          >
+            <MapPin className="w-[20px] h-[20px]" />
+            <span>Lahan</span>
+          </Link>
           {hasAnyMemberPermission() && (
             hasPermission('member:user:view') ? (
               <Link

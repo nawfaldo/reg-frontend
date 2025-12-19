@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Eye, Pencil, User } from 'lucide-react'
 import MemberHeader from '../../../../../../component/headers/MemberHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../lib/api'
+import { queryKeys } from '../../../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/member/user/')({
   component: RouteComponent,
@@ -13,31 +15,21 @@ function RouteComponent() {
   const { hasPermission } = usePermissions(companyName)
 
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   const { data: membersData, isLoading: isLoadingMembers, error } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'members'],
+    queryKey: companyData?.company?.id ? queryKeys.company.members(companyData.company.id) : ['company', companyData?.company?.id, 'members'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/${companyData.company.id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch members');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });

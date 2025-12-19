@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { api } from '../../../../lib/api'
+import { server } from '../../../../lib/api'
+import { queryKeys } from '../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/billing')({
   component: RouteComponent,
@@ -29,9 +30,9 @@ function RouteComponent() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ["me"],
+    queryKey: queryKeys.me,
     queryFn: async () => {
-      const { data, error } = await api.api.me.get();
+      const { data, error } = await server.api.me.get();
       if (error) throw error;
       return data;
     },
@@ -40,23 +41,18 @@ function RouteComponent() {
   const checkoutMutation = useMutation({
     mutationFn: async (priceId: string) => {
       // Get company ID
-      const { data: companiesData } = await api.api.company.get();
+      const { data: companiesData } = await server.api.company.get();
       if (!companiesData?.companies) throw new Error("Failed to fetch companies");
       
       const company = companiesData.companies.find((c: any) => c.name === companyName);
       if (!company) throw new Error("Company not found");
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/api/payment/create-checkout-session`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ priceId, companyId: company.id }),
-        }
-      );
-      if (!response.ok) throw new Error("Gagal membuat sesi checkout");
-      return response.json();
+      const { data, error } = await server.api.payment["create-checkout-session"].post({
+        priceId,
+        companyId: company.id,
+      });
+      if (error) throw error;
+      return data;
     },
     onSuccess: (data) => {
       if (data.url) window.location.href = data.url;

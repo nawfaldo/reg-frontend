@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { Loader2, ChevronDown, X } from 'lucide-react'
 import EditHeader from '../../../../../../../component/headers/EditHeader'
 import { usePermissions } from '../../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../../lib/api'
+import { queryKeys } from '../../../../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/member/user/$userId/edit')({
   component: RouteComponent,
@@ -20,49 +22,34 @@ function RouteComponent() {
 
   // Fetch company ID
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   // Fetch company members to get user details
   const { data: membersData, isLoading: isLoadingMembers } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'members'],
+    queryKey: companyData?.company?.id ? queryKeys.company.members(companyData.company.id) : ['company', companyData?.company?.id, 'members'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch members');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });
 
   // Fetch roles
   const { data: rolesData, isLoading: isLoadingRoles } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'roles'],
+    queryKey: companyData?.company?.id ? queryKeys.company.roles(companyData.company.id) : ['company', companyData?.company?.id, 'roles'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch roles');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).roles.get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });
@@ -82,40 +69,39 @@ function RouteComponent() {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
       // Delete all existing UserCompany records for this user
-      const existingRecords = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/members/${userId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (!existingRecords.ok && existingRecords.status !== 404) {
-        const errorData = await existingRecords.json();
-        throw new Error(errorData.error || 'Failed to remove existing roles');
+      try {
+        const deleteResult = await (server.api.company as any)({ id: companyData.company.id }).members({ userId }).delete();
+        if ('error' in deleteResult && deleteResult.error) {
+          // Ignore 404 errors as the user might not have existing roles
+          if (deleteResult.error !== 'Not found') {
+            throw new Error((deleteResult.error as any).value?.error || 'Failed to remove existing roles');
+          }
+        }
+      } catch (err: any) {
+        // Ignore 404 errors
+        if (err.message && !err.message.includes('404') && !err.message.includes('Not found')) {
+          throw err;
+        }
       }
 
       // Add new roles
       if (data.roleIds.length > 0) {
-        const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/members`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            userId: userId,
-            roleIds: data.roleIds,
-          }),
+        const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).members.post({
+          userId: userId,
+          roleIds: data.roleIds,
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update member roles');
+        if (error) throw error;
+        if ('error' in response && response.error) {
+          throw new Error((response.error as any).value?.error || 'Failed to update member roles');
         }
       }
 
       return { success: true };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company', companyData?.company?.id, 'members'] });
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.members(companyData.company.id) });
+      }
       navigate({ to: '/client/company/$companyName/member/user/$userId', params: { companyName, userId } });
     },
     onError: (err: Error) => {

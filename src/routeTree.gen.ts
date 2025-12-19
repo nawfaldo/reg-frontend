@@ -24,7 +24,9 @@ import { Route as ClientCompanyCompanyNameRouteImport } from './routes/client/co
 import { Route as ClientCompaniesCreateRouteImport } from './routes/client/companies/create'
 import { Route as ClientCompanyCompanyNameSettingRouteImport } from './routes/client/company/$companyName/setting'
 import { Route as ClientCompanyCompanyNameBillingRouteImport } from './routes/client/company/$companyName/billing'
+import { Route as ClientCompanyCompanyNameGeoTagIndexRouteImport } from './routes/client/company/$companyName/geo-tag/index'
 import { Route as ClientCompanyCompanyNameMemberPermissionRouteImport } from './routes/client/company/$companyName/member/permission'
+import { Route as ClientCompanyCompanyNameGeoTagCreateRouteImport } from './routes/client/company/$companyName/geo-tag/create'
 import { Route as ClientCompanyCompanyNameMemberUserIndexRouteImport } from './routes/client/company/$companyName/member/user/index'
 import { Route as ClientCompanyCompanyNameMemberRoleIndexRouteImport } from './routes/client/company/$companyName/member/role/index'
 import { Route as ClientCompanyCompanyNameMemberUserCreateRouteImport } from './routes/client/company/$companyName/member/user/create'
@@ -112,10 +114,22 @@ const ClientCompanyCompanyNameBillingRoute =
     path: '/billing',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
+const ClientCompanyCompanyNameGeoTagIndexRoute =
+  ClientCompanyCompanyNameGeoTagIndexRouteImport.update({
+    id: '/geo-tag/',
+    path: '/geo-tag/',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
 const ClientCompanyCompanyNameMemberPermissionRoute =
   ClientCompanyCompanyNameMemberPermissionRouteImport.update({
     id: '/member/permission',
     path: '/member/permission',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
+const ClientCompanyCompanyNameGeoTagCreateRoute =
+  ClientCompanyCompanyNameGeoTagCreateRouteImport.update({
+    id: '/geo-tag/create',
+    path: '/geo-tag/create',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
 const ClientCompanyCompanyNameMemberUserIndexRoute =
@@ -183,7 +197,9 @@ export interface FileRoutesByFullPath {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/geo-tag': typeof ClientCompanyCompanyNameGeoTagIndexRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
@@ -209,7 +225,9 @@ export interface FileRoutesByTo {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/geo-tag': typeof ClientCompanyCompanyNameGeoTagIndexRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
@@ -236,7 +254,9 @@ export interface FileRoutesById {
   '/client/profile/': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/geo-tag/': typeof ClientCompanyCompanyNameGeoTagIndexRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/member/role/': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
@@ -264,7 +284,9 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/geo-tag'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/member/role'
@@ -290,7 +312,9 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/geo-tag'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/member/role'
@@ -316,7 +340,9 @@ export interface FileRouteTypes {
     | '/client/profile/'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/geo-tag/'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/member/role/'
@@ -445,11 +471,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientCompanyCompanyNameBillingRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
+    '/client/company/$companyName/geo-tag/': {
+      id: '/client/company/$companyName/geo-tag/'
+      path: '/geo-tag'
+      fullPath: '/client/company/$companyName/geo-tag'
+      preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagIndexRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
     '/client/company/$companyName/member/permission': {
       id: '/client/company/$companyName/member/permission'
       path: '/member/permission'
       fullPath: '/client/company/$companyName/member/permission'
       preLoaderRoute: typeof ClientCompanyCompanyNameMemberPermissionRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
+    '/client/company/$companyName/geo-tag/create': {
+      id: '/client/company/$companyName/geo-tag/create'
+      path: '/geo-tag/create'
+      fullPath: '/client/company/$companyName/geo-tag/create'
+      preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagCreateRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
     '/client/company/$companyName/member/user/': {
@@ -514,7 +554,9 @@ declare module '@tanstack/react-router' {
 interface ClientCompanyCompanyNameRouteChildren {
   ClientCompanyCompanyNameBillingRoute: typeof ClientCompanyCompanyNameBillingRoute
   ClientCompanyCompanyNameSettingRoute: typeof ClientCompanyCompanyNameSettingRoute
+  ClientCompanyCompanyNameGeoTagCreateRoute: typeof ClientCompanyCompanyNameGeoTagCreateRoute
   ClientCompanyCompanyNameMemberPermissionRoute: typeof ClientCompanyCompanyNameMemberPermissionRoute
+  ClientCompanyCompanyNameGeoTagIndexRoute: typeof ClientCompanyCompanyNameGeoTagIndexRoute
   ClientCompanyCompanyNameMemberRoleCreateRoute: typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   ClientCompanyCompanyNameMemberUserCreateRoute: typeof ClientCompanyCompanyNameMemberUserCreateRoute
   ClientCompanyCompanyNameMemberRoleIndexRoute: typeof ClientCompanyCompanyNameMemberRoleIndexRoute
@@ -529,8 +571,12 @@ const ClientCompanyCompanyNameRouteChildren: ClientCompanyCompanyNameRouteChildr
   {
     ClientCompanyCompanyNameBillingRoute: ClientCompanyCompanyNameBillingRoute,
     ClientCompanyCompanyNameSettingRoute: ClientCompanyCompanyNameSettingRoute,
+    ClientCompanyCompanyNameGeoTagCreateRoute:
+      ClientCompanyCompanyNameGeoTagCreateRoute,
     ClientCompanyCompanyNameMemberPermissionRoute:
       ClientCompanyCompanyNameMemberPermissionRoute,
+    ClientCompanyCompanyNameGeoTagIndexRoute:
+      ClientCompanyCompanyNameGeoTagIndexRoute,
     ClientCompanyCompanyNameMemberRoleCreateRoute:
       ClientCompanyCompanyNameMemberRoleCreateRoute,
     ClientCompanyCompanyNameMemberUserCreateRoute:

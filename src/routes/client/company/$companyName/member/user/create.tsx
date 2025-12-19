@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Search, ChevronDown, X } from 'lucide-react'
 import CreateHeader from '../../../../../../component/headers/CreateHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../lib/api'
+import { queryKeys } from '../../../../../../lib/query-keys'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/member/user/create',
@@ -25,46 +27,36 @@ function RouteComponent() {
 
   // Fetch company ID
   const { data: companyData } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   // Fetch roles
   const { data: rolesData, isLoading: isLoadingRoles } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'roles'],
+    queryKey: companyData?.company?.id ? queryKeys.company.roles(companyData.company.id) : ['company', companyData?.company?.id, 'roles'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/${companyData.company.id}/roles`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch roles');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).roles.get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });
 
   const searchUserMutation = useMutation({
     mutationFn: async (email: string) => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/users/search?email=${encodeURIComponent(email)}`, {
-        credentials: 'include',
+      const { data, error } = await server.api.company.users.search.get({
+        query: { email },
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'User not found');
+      if (error) throw error;
+      if ('error' in data && data.error) {
+        throw new Error((data.error as any).value?.error || 'User not found');
       }
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       setSelectedUser(data.user);
@@ -80,27 +72,21 @@ function RouteComponent() {
     mutationFn: async (data: { userId: string; roleIds: string[] }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/company/${companyData.company.id}/members`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          userId: data.userId,
-          roleIds: data.roleIds,
-        }),
+      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).members.post({
+        userId: data.userId,
+        roleIds: data.roleIds,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add member');
+      if (error) throw error;
+      if ('error' in response && response.error) {
+        throw new Error((response.error as any).value?.error || 'Failed to add member');
       }
-
-      return response.json();
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company', companyData?.company?.id] });
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.members(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.byId(companyData.company.id) });
+      }
       navigate({ to: '/client/company/$companyName/member/user', params: { companyName } });
     },
     onError: (err: Error) => {

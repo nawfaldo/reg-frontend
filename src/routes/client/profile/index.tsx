@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "../../../lib/auth-client";
+import { server } from "../../../lib/api";
+import { queryKeys } from "../../../lib/query-keys";
 
 export const Route = createFileRoute('/client/profile/')({
   component: RouteComponent,
@@ -8,13 +10,10 @@ export const Route = createFileRoute('/client/profile/')({
 
 function RouteComponent() {
   const { data: userData, isLoading } = useQuery({
-    queryKey: ["me"],
+    queryKey: queryKeys.me,
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/me`, {
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch user data');
-      const data = await response.json();
+      const { data, error } = await server.api.me.get();
+      if (error) throw error;
       return data;
     },
   });

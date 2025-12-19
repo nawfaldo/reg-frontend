@@ -171,32 +171,342 @@ declare const app: Elysia<"", {
 } & {
     api: {
         company: {
-            get: {
-                body: unknown;
-                params: {};
-                query: unknown;
-                headers: unknown;
-                response: {
-                    200: {
-                        error: string;
-                        companies?: undefined;
-                    } | {
-                        companies: {
-                            isOwner: boolean;
-                            role: string;
-                            permissions: string[];
-                            hasActiveSubscription: boolean | "" | null;
+            ":id": {
+                roles: {
+                    get: {
+                        body: unknown;
+                        params: {
                             id: string;
-                            createdAt: Date;
-                            updatedAt: Date;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                roles?: undefined;
+                            } | {
+                                roles: ({
+                                    permissions: {
+                                        id: string;
+                                        name: string;
+                                        desc: string | null;
+                                    }[];
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    updatedAt: Date;
+                                    name: string;
+                                    companyId: string;
+                                })[];
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                roles: {
+                    ":roleId": {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                roleId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    role?: undefined;
+                                } | {
+                                    role: {
+                                        users: {
+                                            joinedAt: Date;
+                                            id: string;
+                                            email: string;
+                                            name: string;
+                                            image: string | null;
+                                        }[];
+                                        permissions: {
+                                            id: string;
+                                            name: string;
+                                            desc: string | null;
+                                        }[];
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                roles: {
+                    post: {
+                        body: {
+                            permissionIds?: string[] | undefined;
                             name: string;
-                            image: string | null;
+                        };
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                role?: undefined;
+                            } | {
+                                role: {
+                                    permissions: {
+                                        id: string;
+                                        name: string;
+                                        desc: string | null;
+                                    }[];
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    updatedAt: Date;
+                                    name: string;
+                                    companyId: string;
+                                };
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                roles: {
+                    ":roleId": {
+                        put: {
+                            body: {
+                                permissionIds?: string[] | undefined;
+                                name: string;
+                            };
+                            params: {
+                                id: string;
+                                roleId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    role?: undefined;
+                                } | {
+                                    role: {
+                                        permissions: {
+                                            id: string;
+                                            name: string;
+                                            desc: string | null;
+                                        }[];
+                                    } & {
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                roles: {
+                    ":roleId": {
+                        delete: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                roleId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
+            ":id": {
+                members: {
+                    post: {
+                        body: {
                             userId: string;
-                            stripeSubscriptionId: string | null;
-                            stripePriceId: string | null;
-                            stripeCurrentPeriodEnd: Date | null;
-                        }[];
-                        error?: undefined;
+                            roleIds: string[];
+                        };
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                success?: undefined;
+                                message?: undefined;
+                            } | {
+                                success: boolean;
+                                message: string;
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                members: {
+                    ":userId": {
+                        put: {
+                            body: {
+                                roleId: string;
+                            };
+                            params: {
+                                id: string;
+                                userId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                members: {
+                    ":userId": {
+                        delete: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                userId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
                     };
                 };
             };
@@ -298,6 +608,40 @@ declare const app: Elysia<"", {
                                 expected?: string;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
+            get: {
+                body: unknown;
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: {
+                        error: string;
+                        companies?: undefined;
+                    } | {
+                        companies: {
+                            isOwner: boolean;
+                            role: string;
+                            permissions: string[];
+                            hasActiveSubscription: boolean | "" | null;
+                            id: string;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            name: string;
+                            image: string | null;
+                            userId: string;
+                            stripeSubscriptionId: string | null;
+                            stripePriceId: string | null;
+                            stripeCurrentPeriodEnd: Date | null;
+                        }[];
+                        error?: undefined;
                     };
                 };
             };
@@ -493,374 +837,6 @@ declare const app: Elysia<"", {
                             found?: unknown;
                             property?: string;
                             expected?: string;
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                members: {
-                    post: {
-                        body: {
-                            userId: string;
-                            roleIds: string[];
-                        };
-                        params: {
-                            id: string;
-                        } & {};
-                        query: unknown;
-                        headers: unknown;
-                        response: {
-                            200: {
-                                error: string;
-                                success?: undefined;
-                                message?: undefined;
-                            } | {
-                                success: boolean;
-                                message: string;
-                                error?: undefined;
-                            };
-                            422: {
-                                type: "validation";
-                                on: string;
-                                summary?: string;
-                                message?: string;
-                                found?: unknown;
-                                property?: string;
-                                expected?: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                members: {
-                    ":userId": {
-                        put: {
-                            body: {
-                                roleId: string;
-                            };
-                            params: {
-                                id: string;
-                                userId: string;
-                            } & {};
-                            query: unknown;
-                            headers: unknown;
-                            response: {
-                                200: {
-                                    error: string;
-                                    success?: undefined;
-                                    message?: undefined;
-                                } | {
-                                    success: boolean;
-                                    message: string;
-                                    error?: undefined;
-                                };
-                                422: {
-                                    type: "validation";
-                                    on: string;
-                                    summary?: string;
-                                    message?: string;
-                                    found?: unknown;
-                                    property?: string;
-                                    expected?: string;
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                members: {
-                    ":userId": {
-                        delete: {
-                            body: unknown;
-                            params: {
-                                id: string;
-                                userId: string;
-                            } & {};
-                            query: unknown;
-                            headers: unknown;
-                            response: {
-                                200: {
-                                    error: string;
-                                    success?: undefined;
-                                    message?: undefined;
-                                } | {
-                                    success: boolean;
-                                    message: string;
-                                    error?: undefined;
-                                };
-                                422: {
-                                    type: "validation";
-                                    on: string;
-                                    summary?: string;
-                                    message?: string;
-                                    found?: unknown;
-                                    property?: string;
-                                    expected?: string;
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                roles: {
-                    get: {
-                        body: unknown;
-                        params: {
-                            id: string;
-                        } & {};
-                        query: unknown;
-                        headers: unknown;
-                        response: {
-                            200: {
-                                error: string;
-                                roles?: undefined;
-                            } | {
-                                roles: ({
-                                    permissions: {
-                                        id: string;
-                                        name: string;
-                                        desc: string | null;
-                                    }[];
-                                } & {
-                                    id: string;
-                                    createdAt: Date;
-                                    updatedAt: Date;
-                                    name: string;
-                                    companyId: string;
-                                })[];
-                                error?: undefined;
-                            };
-                            422: {
-                                type: "validation";
-                                on: string;
-                                summary?: string;
-                                message?: string;
-                                found?: unknown;
-                                property?: string;
-                                expected?: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                roles: {
-                    ":roleId": {
-                        get: {
-                            body: unknown;
-                            params: {
-                                id: string;
-                                roleId: string;
-                            } & {};
-                            query: unknown;
-                            headers: unknown;
-                            response: {
-                                200: {
-                                    error: string;
-                                    role?: undefined;
-                                } | {
-                                    role: {
-                                        users: {
-                                            joinedAt: Date;
-                                            id: string;
-                                            email: string;
-                                            name: string;
-                                            image: string | null;
-                                        }[];
-                                        permissions: {
-                                            id: string;
-                                            name: string;
-                                            desc: string | null;
-                                        }[];
-                                        id: string;
-                                        createdAt: Date;
-                                        updatedAt: Date;
-                                        name: string;
-                                        companyId: string;
-                                    };
-                                    error?: undefined;
-                                };
-                                422: {
-                                    type: "validation";
-                                    on: string;
-                                    summary?: string;
-                                    message?: string;
-                                    found?: unknown;
-                                    property?: string;
-                                    expected?: string;
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                roles: {
-                    post: {
-                        body: {
-                            permissionIds?: string[] | undefined;
-                            name: string;
-                        };
-                        params: {
-                            id: string;
-                        } & {};
-                        query: unknown;
-                        headers: unknown;
-                        response: {
-                            200: {
-                                error: string;
-                                role?: undefined;
-                            } | {
-                                role: {
-                                    permissions: {
-                                        id: string;
-                                        name: string;
-                                        desc: string | null;
-                                    }[];
-                                } & {
-                                    id: string;
-                                    createdAt: Date;
-                                    updatedAt: Date;
-                                    name: string;
-                                    companyId: string;
-                                };
-                                error?: undefined;
-                            };
-                            422: {
-                                type: "validation";
-                                on: string;
-                                summary?: string;
-                                message?: string;
-                                found?: unknown;
-                                property?: string;
-                                expected?: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                roles: {
-                    ":roleId": {
-                        put: {
-                            body: {
-                                permissionIds?: string[] | undefined;
-                                name: string;
-                            };
-                            params: {
-                                id: string;
-                                roleId: string;
-                            } & {};
-                            query: unknown;
-                            headers: unknown;
-                            response: {
-                                200: {
-                                    error: string;
-                                    role?: undefined;
-                                } | {
-                                    role: {
-                                        permissions: {
-                                            id: string;
-                                            name: string;
-                                            desc: string | null;
-                                        }[];
-                                    } & {
-                                        id: string;
-                                        createdAt: Date;
-                                        updatedAt: Date;
-                                        name: string;
-                                        companyId: string;
-                                    };
-                                    error?: undefined;
-                                };
-                                422: {
-                                    type: "validation";
-                                    on: string;
-                                    summary?: string;
-                                    message?: string;
-                                    found?: unknown;
-                                    property?: string;
-                                    expected?: string;
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-} & {
-    api: {
-        company: {
-            ":id": {
-                roles: {
-                    ":roleId": {
-                        delete: {
-                            body: unknown;
-                            params: {
-                                id: string;
-                                roleId: string;
-                            } & {};
-                            query: unknown;
-                            headers: unknown;
-                            response: {
-                                200: {
-                                    error: string;
-                                    success?: undefined;
-                                    message?: undefined;
-                                } | {
-                                    success: boolean;
-                                    message: string;
-                                    error?: undefined;
-                                };
-                                422: {
-                                    type: "validation";
-                                    on: string;
-                                    summary?: string;
-                                    message?: string;
-                                    found?: unknown;
-                                    property?: string;
-                                    expected?: string;
-                                };
-                            };
                         };
                     };
                 };

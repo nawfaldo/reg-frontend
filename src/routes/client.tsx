@@ -7,7 +7,8 @@ import {
 import { authClient } from "../lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Home, User } from "lucide-react";
-import { api } from "../lib/api";
+import { server } from "../lib/api";
+import { queryKeys } from "../lib/query-keys";
 
 export const Route = createFileRoute("/client")({
   beforeLoad: async ({ location }) => {
@@ -26,9 +27,9 @@ export const Route = createFileRoute("/client")({
 
 function ClientLayout() {
   const { data: userData } = useQuery({
-    queryKey: ["me"],
+    queryKey: queryKeys.me,
     queryFn: async () => {
-      const { data, error } = await api.api.me.get();
+      const { data, error } = await server.api.me.get();
       if (error) throw error;
       return data;
     },

@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import MemberHeader from '../../../../../component/headers/MemberHeader';
 import { usePermissions } from '../../../../../hooks/usePermissions'
+import { server } from '../../../../../lib/api'
+import { queryKeys } from '../../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/member/permission')({
   component: RouteComponent,
@@ -13,16 +15,11 @@ function RouteComponent() {
   const { hasPermission } = usePermissions(companyName)
   
   const { data: permissionsData, isLoading, error } = useQuery({
-    queryKey: ['permissions'],
+    queryKey: queryKeys.company.permissions,
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/permissions`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch permissions');
-      }
-      return response.json();
+      const { data, error } = await server.api.company.permissions.get();
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -44,7 +41,6 @@ function RouteComponent() {
     );
   }
 
-  // Check permission to view permissions
   if (!hasPermission('member:permission:view')) {
     return (
       <div className="px-6 pt-6 h-full bg-white">

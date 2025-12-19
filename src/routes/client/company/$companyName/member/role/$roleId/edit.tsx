@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, X, Loader2 } from 'lucide-react'
 import EditHeader from '../../../../../../../component/headers/EditHeader'
 import { usePermissions } from '../../../../../../../hooks/usePermissions'
+import { server } from '../../../../../../../lib/api'
+import { queryKeys } from '../../../../../../../lib/query-keys'
 
 export const Route = createFileRoute('/client/company/$companyName/member/role/$roleId/edit')({
   component: RouteComponent,
@@ -21,48 +23,33 @@ function RouteComponent() {
 
   // Fetch company ID
   const { data: companyData } = useQuery({
-    queryKey: ['company', companyName],
+    queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/name/${encodeURIComponent(companyName)}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch company');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
+      if (error) throw error;
+      return data;
     },
   });
 
   // Fetch role data
   const { data: roleData, isLoading: isLoadingRole } = useQuery({
-    queryKey: ['company', companyData?.company?.id, 'roles', roleId],
+    queryKey: companyData?.company?.id ? queryKeys.company.role(companyData.company.id, roleId) : ['company', companyData?.company?.id, 'roles', roleId],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles/${roleId}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch role');
-      }
-      return response.json();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).roles({ roleId }).get();
+      if (error) throw error;
+      return data;
     },
     enabled: !!companyData?.company?.id,
   });
 
   // Fetch permissions
   const { data: permissionsData, isLoading: isLoadingPermissions } = useQuery({
-    queryKey: ['permissions'],
+    queryKey: queryKeys.company.permissions,
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/permissions`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch permissions');
-      }
-      return response.json();
+      const { data, error } = await server.api.company.permissions.get();
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -78,24 +65,18 @@ function RouteComponent() {
     mutationFn: async (data: { name: string; permissionIds?: string[] }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/company/${companyData.company.id}/roles/${roleId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update role');
+      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).roles({ roleId }).put(data);
+      if (error) throw error;
+      if ('error' in response && response.error) {
+        throw new Error((response.error as any).value?.error || 'Failed to update role');
       }
-
-      return response.json();
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company', companyData?.company?.id, 'roles'] });
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.roles(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.role(companyData.company.id, roleId) });
+      }
       navigate({ to: '/client/company/$companyName/member/role/$roleId', params: { companyName, roleId } });
     },
     onError: (err: Error) => {
