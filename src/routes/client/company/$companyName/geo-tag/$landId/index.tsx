@@ -3,7 +3,7 @@ import DetailHeader from '../../../../../../component/headers/DetailHeader'
 import { queryKeys } from '../../../../../../lib/query-keys'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
 import { MapContainer, TileLayer, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -55,6 +55,69 @@ function RouteComponent() {
   })
 
   const land = landData?.land
+
+  // Check deforestation mutation
+  const checkDeforestationMutation = useMutation({
+    mutationFn: async () => {
+      if (!land?.geoPolygon) throw new Error('GeoPolygon tidak tersedia');
+      if (!companyData?.company?.id) throw new Error('Company not found');
+
+      try {
+        // Step 1: Call Python API to check deforestation
+        const pythonApiUrl = `${import.meta.env.VITE_AI_URL}/check-deforestation`;
+        const pythonResponse = await fetch(pythonApiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            geojson: land.geoPolygon,
+            years_back: 5,
+          }),
+        });
+
+        if (!pythonResponse.ok) {
+          let errorMessage = 'Failed to check deforestation';
+          try {
+            const errorData = await pythonResponse.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch (e) {
+            errorMessage = `HTTP ${pythonResponse.status}: ${pythonResponse.statusText}`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const pythonData = await pythonResponse.json();
+        const isDeforestationFree = pythonData.is_clean;
+
+        // Step 2: Update server with deforestation status
+        const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).land({ landId }).put({
+          isDeforestationFree,
+        });
+
+        if (error) throw error;
+        if ('error' in response && response.error) {
+          throw new Error((response.error as any).value?.error || 'Failed to update deforestation status');
+        }
+
+        return { ...pythonData, isDeforestationFree };
+      } catch (err: any) {
+        console.error('Error in checkDeforestationMutation:', err);
+        throw err instanceof Error ? err : new Error(err?.message || 'Gagal mengecek deforestasi');
+      }
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh data
+      if (companyData?.company?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.landById(companyData.company.id, landId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.land(companyData.company.id) });
+      }
+    },
+    onError: (err: Error) => {
+      console.error('Check deforestation error:', err);
+      alert(err.message || 'Gagal mengecek deforestasi');
+    },
+  });
 
   // Delete land mutation
   const deleteMutation = useMutation({
@@ -210,9 +273,31 @@ function GeoJSONLayer({ data }: { data: any }) {
 
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              Deforestation Free
+              Bebas Deforestasi
             </label>
-            <p className='text-sm'>{land.isDeforestationFree === null ? '-' : land.isDeforestationFree ? 'Ya' : 'Tidak'}</p>
+            <div className="flex items-center gap-3">
+              <p className='text-sm'>{land.isDeforestationFree === null ? '-' : land.isDeforestationFree ? 'Ya' : 'Tidak'}</p>
+              {land.geoPolygon && (
+                <button
+                  type="button"
+                  onClick={() => checkDeforestationMutation.mutate()}
+                  disabled={checkDeforestationMutation.isPending}
+                  className="px-2 py-2 text-sm flex items-center gap-1 disabled:opacity-50"
+                >
+                  {checkDeforestationMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className='underline'>Mengecek...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4" />
+                      <span className='underline'>{land.isDeforestationFree !== null ? 'Check Ulang' : 'Check'}</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

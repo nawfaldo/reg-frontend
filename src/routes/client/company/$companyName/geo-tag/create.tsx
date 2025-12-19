@@ -1,11 +1,11 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
 import CreateHeader from '../../../../../component/headers/CreateHeader'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GeoMapEditor from '../../../../../component/GeoMapEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../lib/api'
 import { queryKeys } from '../../../../../lib/query-keys'
-import { Loader2, TriangleAlert } from 'lucide-react'
+import { Loader2, TriangleAlert, Search } from 'lucide-react'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/geo-tag/create',
@@ -25,6 +25,11 @@ function RouteComponent() {
   const [location, setLocation] = useState<string>("")
   const [geoPolygon, setGeoPolygon] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [searchCenter, setSearchCenter] = useState<{ lat: number, lng: number } | undefined>(undefined)
+  const [isSearching, setIsSearching] = useState(false)
+  const [suggestions, setSuggestions] = useState<Array<{ lat: number, lng: number, displayName: string }>>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   // Fetch company data
   const { data: companyData } = useQuery({
@@ -35,6 +40,101 @@ function RouteComponent() {
       return data;
     },
   });
+
+  // Function to search location suggestions using forward geocoding
+  const searchLocationSuggestions = async (query: string): Promise<Array<{ lat: number, lng: number, displayName: string }>> => {
+    if (!query || query.trim().length === 0) return [];
+    
+    setIsSearching(true);
+    try {
+      // Try with countrycodes first, then without if no results
+      let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&countrycodes=id&accept-language=id,en`;
+      
+      let response = await fetch(url, {
+        headers: {
+          'User-Agent': 'RegApp/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error('Nominatim API error:', response.status, response.statusText);
+        return [];
+      }
+      
+      let data = await response.json();
+      
+      // If no results with countrycodes, try without it (broader search)
+      if (!data || data.length === 0) {
+        console.log('No results with countrycodes, trying without...');
+        url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&accept-language=id,en`;
+        response = await fetch(url, {
+          headers: {
+            'User-Agent': 'RegApp/1.0'
+          }
+        });
+        
+        if (!response.ok) {
+          console.error('Nominatim API error (fallback):', response.status, response.statusText);
+          return [];
+        }
+        
+        data = await response.json();
+      }
+      console.log('Search results for:', query, data);
+      
+      if (data && data.length > 0) {
+        const results = data.map((result: any) => ({
+          lat: parseFloat(result.lat),
+          lng: parseFloat(result.lon),
+          displayName: result.display_name || query
+        }));
+        console.log('Parsed results:', results);
+        return results;
+      }
+      
+      console.log('No results found for:', query);
+      return [];
+    } catch (error) {
+      console.error('Error searching location:', error);
+      return [];
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounced search for suggestions using useEffect
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      const results = await searchLocationSuggestions(searchQuery);
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Handle search input change
+  const handleSearchInputChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion: { lat: number, lng: number, displayName: string }) => {
+    setSearchQuery(suggestion.displayName);
+    setSearchCenter({ lat: suggestion.lat, lng: suggestion.lng });
+    setLocation(suggestion.displayName);
+    setLatitude(suggestion.lat);
+    setLongitude(suggestion.lng);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setError(null);
+  };
 
   // Function to get location from lat/lng using reverse geocoding
   const getLocationFromCoordinates = async (lat: number, lng: number): Promise<string> => {
@@ -116,6 +216,27 @@ function RouteComponent() {
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery || searchQuery.trim().length === 0) {
+      setError('Masukkan nama lokasi untuk dicari');
+      return;
+    }
+
+    // If there are suggestions, use the first one
+    if (suggestions.length > 0) {
+      handleSuggestionClick(suggestions[0]);
+      return;
+    }
+
+    // Otherwise, search for the query
+    const results = await searchLocationSuggestions(searchQuery);
+    if (results.length > 0) {
+      handleSuggestionClick(results[0]);
+    } else {
+      setError('Lokasi tidak ditemukan. Coba dengan nama yang lebih spesifik.');
+    }
+  };
+
   const handleCreate = () => {
     setError(null);
 
@@ -170,7 +291,7 @@ function RouteComponent() {
         </div>
       )}
 
-<div className="space-y-6">
+    <div className="space-y-6">
         {/* Name Input */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
@@ -187,13 +308,85 @@ function RouteComponent() {
 
         {/* GeoMapEditor */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Gambar Area Lahan
-          </label>
+            <label className="block text-sm font-medium text-black mb-2">
+              Gambar Area Lahan
+            </label>
+            <div className="flex gap-2 items-start mb-3">
+            <div className="relative flex-1 max-w-[400px] z-50">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearchInputChange(e.target.value)}
+                onFocus={() => {
+                  // Show suggestions if available when input is focused
+                  if (suggestions.length > 0) {
+                    setShowSuggestions(true);
+                  } else if (searchQuery.trim().length >= 2) {
+                    // If there's a query but no suggestions yet, trigger search
+                    searchLocationSuggestions(searchQuery).then(results => {
+                      setSuggestions(results);
+                      setShowSuggestions(results.length > 0);
+                    });
+                  }
+                }}
+                onBlur={() => {
+                  // Delay to allow click on suggestion
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  } else if (e.key === 'Escape') {
+                    setShowSuggestions(false);
+                  }
+                }}
+                placeholder="Contoh: Jakarta, Bandung, Surabaya..."
+                className="w-full px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white relative z-50"
+              />
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto" style={{ top: '100%', zIndex: 9999 }}>
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      onMouseDown={(e) => e.preventDefault()} // Prevent onBlur from firing
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    >
+                      <div className="text-sm text-gray-900">{suggestion.displayName}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {suggestion.lat.toFixed(6)}, {suggestion.lng.toFixed(6)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="px-2 py-2 text-sm flex items-center gap-1 disabled:opacity-50 relative z-50"
+            >
+              {isSearching ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className='underline'>Mencari...</span>
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  <span className='underline'>Cari</span>
+                </>
+              )}
+            </button>
+          </div>
           <GeoMapEditor 
             onChange={handleMapChange} 
             width={1000}
             height={500}
+            searchCenter={searchCenter}
           />
           {geoPolygon && (
             <p className="mt-2 text-sm text-gray-600">

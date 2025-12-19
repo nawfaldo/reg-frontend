@@ -27,6 +27,7 @@ interface GeoMapEditorProps {
     height?: string | number;
     initialGeoJson?: string; // GeoJSON string untuk load polygon yang sudah ada
     initialCenter?: { lat: number, lng: number }; // Center untuk auto-zoom
+    searchCenter?: { lat: number, lng: number }; // Center untuk search location (akan update map)
 }
 
 // Fungsi untuk menghitung area polygon tanpa turf.js (menggunakan spherical geometry)
@@ -203,7 +204,20 @@ function DrawControl({ featureGroupRef, onChange, initialGeoJson }: { featureGro
     return null;
 }
 
-export default function GeoMapEditor({ onChange, width = '100%', height = '400px', initialGeoJson, initialCenter }: GeoMapEditorProps) {
+// Component untuk update map center ketika searchCenter berubah
+function MapCenterUpdater({ searchCenter }: { searchCenter?: { lat: number, lng: number } }) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (searchCenter && searchCenter.lat !== 0 && searchCenter.lng !== 0) {
+            map.setView([searchCenter.lat, searchCenter.lng], 13, { animate: true });
+        }
+    }, [searchCenter, map]);
+
+    return null;
+}
+
+export default function GeoMapEditor({ onChange, width = '100%', height = '400px', initialGeoJson, initialCenter, searchCenter }: GeoMapEditorProps) {
     // Ref untuk feature group
     const featureGroupRef = useRef<any>(null);
 
@@ -239,13 +253,13 @@ export default function GeoMapEditor({ onChange, width = '100%', height = '400px
 
     return (
         <div 
-            className="border border-gray-300 rounded-lg overflow-hidden"
+            className="border border-gray-300 rounded-lg overflow-hidden relative z-0"
             style={{ width: widthStyle, height: heightStyle }}
         >
             <MapContainer 
                 center={center} 
                 zoom={zoom} 
-                style={{ height: '100%', width: '100%' }}
+                style={{ height: '100%', width: '100%', position: 'relative', zIndex: 0 }}
             >
                 {/* Layer Satelit (Esri World Imagery) */}
                 <TileLayer
@@ -262,6 +276,7 @@ export default function GeoMapEditor({ onChange, width = '100%', height = '400px
 
                 <FeatureGroup ref={featureGroupRef}>
                     <DrawControl featureGroupRef={featureGroupRef} onChange={onChange} initialGeoJson={initialGeoJson} />
+                    <MapCenterUpdater searchCenter={searchCenter} />
                 </FeatureGroup>
             </MapContainer>
         </div>
