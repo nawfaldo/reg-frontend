@@ -14,6 +14,8 @@ export const queryKeys = {
     role: (companyId: string, roleId: string) => ["company", companyId, "roles", roleId] as const,
     permissions: ["company", "permissions"] as const,
     userSearch: (email: string) => ["company", "users", "search", email] as const,
+    land: (companyId: string) => ["company", companyId, "land"] as const,
+    landById: (companyId: string, landId: string) => ["company", companyId, "land", landId] as const,
   },
 } as const;
 

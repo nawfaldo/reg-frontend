@@ -515,6 +515,245 @@ declare const app: Elysia<"", {
 } & {
     api: {
         company: {
+            ":id": {
+                land: {
+                    get: {
+                        body: unknown;
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                lands?: undefined;
+                            } | {
+                                lands: {
+                                    id: string;
+                                    updatedAt: Date;
+                                    name: string;
+                                    companyId: string;
+                                    areaHectares: number;
+                                    latitude: number;
+                                    longitude: number;
+                                    location: string;
+                                    geoPolygon: string;
+                                    isDeforestationFree: boolean | null;
+                                    recordedAt: Date;
+                                }[];
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                land: {
+                    ":landId": {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                landId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    land?: undefined;
+                                } | {
+                                    land: {
+                                        company: {
+                                            id: string;
+                                            name: string;
+                                        };
+                                    } & {
+                                        id: string;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                        areaHectares: number;
+                                        latitude: number;
+                                        longitude: number;
+                                        location: string;
+                                        geoPolygon: string;
+                                        isDeforestationFree: boolean | null;
+                                        recordedAt: Date;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                land: {
+                    post: {
+                        body: {
+                            isDeforestationFree?: boolean | undefined;
+                            name: string;
+                            areaHectares: number;
+                            latitude: number;
+                            longitude: number;
+                            location: string;
+                            geoPolygon: string;
+                        };
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                land?: undefined;
+                            } | {
+                                land: {
+                                    id: string;
+                                    updatedAt: Date;
+                                    name: string;
+                                    companyId: string;
+                                    areaHectares: number;
+                                    latitude: number;
+                                    longitude: number;
+                                    location: string;
+                                    geoPolygon: string;
+                                    isDeforestationFree: boolean | null;
+                                    recordedAt: Date;
+                                };
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                land: {
+                    ":landId": {
+                        put: {
+                            body: {
+                                name?: string | undefined;
+                                areaHectares?: number | undefined;
+                                latitude?: number | undefined;
+                                longitude?: number | undefined;
+                                location?: string | undefined;
+                                geoPolygon?: string | undefined;
+                                isDeforestationFree?: boolean | undefined;
+                            };
+                            params: {
+                                id: string;
+                                landId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    land?: undefined;
+                                } | {
+                                    land: {
+                                        id: string;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                        areaHectares: number;
+                                        latitude: number;
+                                        longitude: number;
+                                        location: string;
+                                        geoPolygon: string;
+                                        isDeforestationFree: boolean | null;
+                                        recordedAt: Date;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                land: {
+                    ":landId": {
+                        delete: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                landId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
             permissions: {
                 get: {
                     body: unknown;

@@ -1,20 +1,20 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
-import CreateHeader from '../../../../../component/headers/CreateHeader'
-import { useState } from 'react'
-import GeoMapEditor from '../../../../../component/GeoMapEditor'
+import EditHeader from '../../../../../../component/headers/EditHeader'
+import { useState, useEffect } from 'react'
+import GeoMapEditor from '../../../../../../component/GeoMapEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { server } from '../../../../../lib/api'
-import { queryKeys } from '../../../../../lib/query-keys'
+import { server } from '../../../../../../lib/api'
+import { queryKeys } from '../../../../../../lib/query-keys'
 import { Loader2, TriangleAlert } from 'lucide-react'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/geo-tag/create',
+  '/client/company/$companyName/geo-tag/$landId/edit',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/geo-tag/create' })
+  const { companyName, landId } = useParams({ from: '/client/company/$companyName/geo-tag/$landId/edit' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -35,6 +35,32 @@ function RouteComponent() {
       return data;
     },
   });
+
+  // Fetch land data
+  const { data: landData, isLoading: isLoadingLand } = useQuery({
+    queryKey: companyData?.company?.id ? queryKeys.company.landById(companyData.company.id, landId) : ['land', landId],
+    queryFn: async () => {
+      if (!companyData?.company?.id) return null;
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).land({ landId }).get();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!companyData?.company?.id,
+  })
+
+  const land = landData?.land
+
+  // Pre-fill form with existing data
+  useEffect(() => {
+    if (land) {
+      setName(land.name || "")
+      setAreaHectares(land.areaHectares || 0)
+      setLatitude(land.latitude || 0)
+      setLongitude(land.longitude || 0)
+      setLocation(land.location || "")
+      setGeoPolygon(land.geoPolygon || "")
+    }
+  }, [land])
 
   // Function to get location from lat/lng using reverse geocoding
   const getLocationFromCoordinates = async (lat: number, lng: number): Promise<string> => {
@@ -69,30 +95,31 @@ function RouteComponent() {
     }
   };
 
-  // Create land mutation
-  const createMutation = useMutation({
+  // Update land mutation
+  const updateMutation = useMutation({
     mutationFn: async (data: {
-      name: string;
-      areaHectares: number;
-      latitude: number;
-      longitude: number;
-      location: string;
-      geoPolygon: string;
+      name?: string;
+      areaHectares?: number;
+      latitude?: number;
+      longitude?: number;
+      location?: string;
+      geoPolygon?: string;
     }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
 
-      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).land.post(data);
+      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).land({ landId }).put(data);
       if (error) throw error;
       if ('error' in response && response.error) {
-        throw new Error((response.error as any).value?.error || 'Failed to create land');
+        throw new Error((response.error as any).value?.error || 'Failed to update land');
       }
       return response;
     },
     onSuccess: () => {
       if (companyData?.company?.id) {
         queryClient.invalidateQueries({ queryKey: queryKeys.company.land(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.landById(companyData.company.id, landId) });
       }
-      navigate({ to: '/client/company/$companyName/geo-tag', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/geo-tag/$landId', params: { companyName, landId } });
     },
     onError: (err: Error) => {
       setError(err.message);
@@ -116,7 +143,7 @@ function RouteComponent() {
     }
   };
 
-  const handleCreate = () => {
+  const handleSave = () => {
     setError(null);
 
     if (!name || name.trim().length === 0) {
@@ -127,11 +154,6 @@ function RouteComponent() {
       setError('Luas area harus lebih besar dari 0');
       return;
     }
-    if (latitude === 0 && longitude === 0 && geoPolygon === "") {
-      setError('Silakan gambar area lahan di peta');
-      return;
-    }
-
     if (!geoPolygon || geoPolygon.trim().length === 0) {
       setError('GeoPolygon wajib diisi');
       return;
@@ -142,7 +164,7 @@ function RouteComponent() {
       return;
     }
 
-    createMutation.mutate({
+    updateMutation.mutate({
       name: name.trim(),
       areaHectares,
       latitude,
@@ -152,7 +174,7 @@ function RouteComponent() {
     });
   }
 
-  if (!companyData) {
+  if (!companyData || isLoadingLand) {
     return (
       <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
@@ -160,9 +182,19 @@ function RouteComponent() {
     );
   }
 
+  if (!land) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Lahan tidak ditemukan</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-6 pt-1 h-full bg-white">
-      <CreateHeader title="Tambah Lahan" createHandle={handleCreate} />
+      <EditHeader title={`Ubah Lahan: ${land.name}`} saveHandle={handleSave} />
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -170,7 +202,7 @@ function RouteComponent() {
         </div>
       )}
 
-<div className="space-y-6">
+      <div className="space-y-6">
         {/* Name Input */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
@@ -194,6 +226,8 @@ function RouteComponent() {
             onChange={handleMapChange} 
             width={1000}
             height={500}
+            initialGeoJson={geoPolygon || undefined}
+            initialCenter={latitude && longitude ? { lat: latitude, lng: longitude } : undefined}
           />
           {geoPolygon && (
             <p className="mt-2 text-sm text-gray-600">
@@ -258,7 +292,8 @@ function RouteComponent() {
             className="w-[400px] px-3 py-2 text-sm border border-gray-300 bg-gray-50 focus:outline-none"
           />
         </div>
-        </div>
+
+      </div>
     </div>
   )
 }
