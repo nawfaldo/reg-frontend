@@ -1326,6 +1326,7 @@ declare const app: Elysia<"", {
                                         } & {
                                             id: string;
                                             createdAt: Date;
+                                            companyId: string;
                                             commodityId: string;
                                             lotCode: string;
                                             harvestDate: Date;
@@ -1478,6 +1479,773 @@ declare const app: Elysia<"", {
                                     found?: unknown;
                                     property?: string;
                                     expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
+            ":id": {
+                batch: {
+                    get: {
+                        body: unknown;
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                batches?: undefined;
+                            } | {
+                                batches: ({
+                                    commodity: {
+                                        id: string;
+                                        name: string;
+                                        code: string;
+                                    };
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    companyId: string;
+                                    commodityId: string;
+                                    lotCode: string;
+                                    harvestDate: Date;
+                                    totalKg: number;
+                                })[];
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                batchId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    batch?: undefined;
+                                } | {
+                                    batch: {
+                                        commodity: {
+                                            id: string;
+                                            name: string;
+                                            code: string;
+                                        };
+                                    } & {
+                                        id: string;
+                                        createdAt: Date;
+                                        companyId: string;
+                                        commodityId: string;
+                                        lotCode: string;
+                                        harvestDate: Date;
+                                        totalKg: number;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    post: {
+                        body: {
+                            commodityId: string;
+                            lotCode: string;
+                            harvestDate: string;
+                        };
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                batch?: undefined;
+                            } | {
+                                batch: {
+                                    commodity: {
+                                        id: string;
+                                        name: string;
+                                        code: string;
+                                    };
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    companyId: string;
+                                    commodityId: string;
+                                    lotCode: string;
+                                    harvestDate: Date;
+                                    totalKg: number;
+                                };
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        put: {
+                            body: {
+                                lotCode?: string | undefined;
+                                harvestDate?: string | undefined;
+                            };
+                            params: {
+                                id: string;
+                                batchId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    batch?: undefined;
+                                } | {
+                                    batch: {
+                                        commodity: {
+                                            id: string;
+                                            name: string;
+                                            code: string;
+                                        };
+                                    } & {
+                                        id: string;
+                                        createdAt: Date;
+                                        companyId: string;
+                                        commodityId: string;
+                                        lotCode: string;
+                                        harvestDate: Date;
+                                        totalKg: number;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        delete: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                batchId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        source: {
+                            get: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    batchId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        batchSources?: undefined;
+                                    } | {
+                                        batchSources: ({
+                                            land: {
+                                                id: string;
+                                                name: string;
+                                                location: string;
+                                            };
+                                            farmerGroup: {
+                                                id: string;
+                                                name: string;
+                                            };
+                                        } & {
+                                            id: string;
+                                            createdAt: Date;
+                                            landId: string;
+                                            farmerGroupId: string;
+                                            batchId: string;
+                                            volumeKg: number;
+                                            landSnapshot: import("@prisma/client/runtime/client").JsonValue;
+                                        })[];
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        source: {
+                            ":sourceId": {
+                                get: {
+                                    body: unknown;
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        sourceId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            batchSource?: undefined;
+                                        } | {
+                                            batchSource: {
+                                                land: {
+                                                    id: string;
+                                                    name: string;
+                                                    areaHectares: number;
+                                                    latitude: number;
+                                                    longitude: number;
+                                                    location: string;
+                                                };
+                                                farmerGroup: {
+                                                    id: string;
+                                                    name: string;
+                                                };
+                                                batch: {
+                                                    id: string;
+                                                    lotCode: string;
+                                                };
+                                            } & {
+                                                id: string;
+                                                createdAt: Date;
+                                                landId: string;
+                                                farmerGroupId: string;
+                                                batchId: string;
+                                                volumeKg: number;
+                                                landSnapshot: import("@prisma/client/runtime/client").JsonValue;
+                                            };
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        source: {
+                            post: {
+                                body: {
+                                    landSnapshot?: any;
+                                    landId: string;
+                                    farmerGroupId: string;
+                                    volumeKg: number;
+                                };
+                                params: {
+                                    id: string;
+                                    batchId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        batchSource?: undefined;
+                                    } | {
+                                        batchSource: {
+                                            land: {
+                                                id: string;
+                                                name: string;
+                                                areaHectares: number;
+                                                location: string;
+                                            };
+                                            farmerGroup: {
+                                                id: string;
+                                                name: string;
+                                            };
+                                            batch: {
+                                                id: string;
+                                                lotCode: string;
+                                            };
+                                        } & {
+                                            id: string;
+                                            createdAt: Date;
+                                            landId: string;
+                                            farmerGroupId: string;
+                                            batchId: string;
+                                            volumeKg: number;
+                                            landSnapshot: import("@prisma/client/runtime/client").JsonValue;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        source: {
+                            ":sourceId": {
+                                put: {
+                                    body: {
+                                        landId?: string | undefined;
+                                        farmerGroupId?: string | undefined;
+                                        volumeKg?: number | undefined;
+                                        landSnapshot?: any;
+                                    };
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        sourceId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            batchSource?: undefined;
+                                        } | {
+                                            batchSource: {
+                                                land: {
+                                                    id: string;
+                                                    name: string;
+                                                    areaHectares: number;
+                                                    location: string;
+                                                };
+                                                farmerGroup: {
+                                                    id: string;
+                                                    name: string;
+                                                };
+                                                batch: {
+                                                    id: string;
+                                                    lotCode: string;
+                                                };
+                                            } & {
+                                                id: string;
+                                                createdAt: Date;
+                                                landId: string;
+                                                farmerGroupId: string;
+                                                batchId: string;
+                                                volumeKg: number;
+                                                landSnapshot: import("@prisma/client/runtime/client").JsonValue;
+                                            };
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        source: {
+                            ":sourceId": {
+                                delete: {
+                                    body: unknown;
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        sourceId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            success?: undefined;
+                                            message?: undefined;
+                                        } | {
+                                            success: boolean;
+                                            message: string;
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        attribute: {
+                            get: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    batchId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        batchAttributes?: undefined;
+                                    } | {
+                                        batchAttributes: {
+                                            id: string;
+                                            recordedAt: Date;
+                                            batchId: string;
+                                            key: string;
+                                            value: string;
+                                            unit: string | null;
+                                        }[];
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        attribute: {
+                            ":attributeId": {
+                                get: {
+                                    body: unknown;
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        attributeId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            batchAttribute?: undefined;
+                                        } | {
+                                            batchAttribute: {
+                                                batch: {
+                                                    id: string;
+                                                    lotCode: string;
+                                                };
+                                            } & {
+                                                id: string;
+                                                recordedAt: Date;
+                                                batchId: string;
+                                                key: string;
+                                                value: string;
+                                                unit: string | null;
+                                            };
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        attribute: {
+                            post: {
+                                body: {
+                                    recordedAt?: string | undefined;
+                                    unit?: string | undefined;
+                                    key: string;
+                                    value: string;
+                                };
+                                params: {
+                                    id: string;
+                                    batchId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        batchAttribute?: undefined;
+                                    } | {
+                                        batchAttribute: {
+                                            batch: {
+                                                id: string;
+                                                lotCode: string;
+                                            };
+                                        } & {
+                                            id: string;
+                                            recordedAt: Date;
+                                            batchId: string;
+                                            key: string;
+                                            value: string;
+                                            unit: string | null;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        attribute: {
+                            ":attributeId": {
+                                put: {
+                                    body: {
+                                        recordedAt?: string | undefined;
+                                        key?: string | undefined;
+                                        value?: string | undefined;
+                                        unit?: string | undefined;
+                                    };
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        attributeId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            batchAttribute?: undefined;
+                                        } | {
+                                            batchAttribute: {
+                                                batch: {
+                                                    id: string;
+                                                    lotCode: string;
+                                                };
+                                            } & {
+                                                id: string;
+                                                recordedAt: Date;
+                                                batchId: string;
+                                                key: string;
+                                                value: string;
+                                                unit: string | null;
+                                            };
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                batch: {
+                    ":batchId": {
+                        attribute: {
+                            ":attributeId": {
+                                delete: {
+                                    body: unknown;
+                                    params: {
+                                        id: string;
+                                        batchId: string;
+                                        attributeId: string;
+                                    } & {};
+                                    query: unknown;
+                                    headers: unknown;
+                                    response: {
+                                        200: {
+                                            error: string;
+                                            success?: undefined;
+                                            message?: undefined;
+                                        } | {
+                                            success: boolean;
+                                            message: string;
+                                            error?: undefined;
+                                        };
+                                        422: {
+                                            type: "validation";
+                                            on: string;
+                                            summary?: string;
+                                            message?: string;
+                                            found?: unknown;
+                                            property?: string;
+                                            expected?: string;
+                                        };
+                                    };
                                 };
                             };
                         };

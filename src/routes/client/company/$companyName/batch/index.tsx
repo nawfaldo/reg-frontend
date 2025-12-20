@@ -7,14 +7,12 @@ import { queryKeys } from '../../../../../lib/query-keys'
 import PrimaryButton from '../../../../../component/buttons/PrimaryButton'
 import { useState } from 'react'
 
-export const Route = createFileRoute('/client/company/$companyName/commodity/')(
-  {
-    component: RouteComponent,
-  },
-)
+export const Route = createFileRoute('/client/company/$companyName/batch/')({
+  component: RouteComponent,
+})
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/commodity/' })
+  const { companyName } = useParams({ from: '/client/company/$companyName/batch/' })
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -27,11 +25,11 @@ function RouteComponent() {
     },
   });
 
-  const { data: commoditiesData, isLoading: isLoadingCommodities, error } = useQuery({
-    queryKey: companyData?.company?.id ? queryKeys.company.commodities(companyData.company.id) : ['company', companyData?.company?.id, 'commodities'],
+  const { data: batchesData, isLoading: isLoadingBatches, error } = useQuery({
+    queryKey: companyData?.company?.id ? queryKeys.company.batches(companyData.company.id) : ['company', companyData?.company?.id, 'batches'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).commodity.get();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).batch.get();
       if (error) throw error;
       return data;
     },
@@ -45,10 +43,10 @@ function RouteComponent() {
   }
 
   const handleCreate = () => {
-    navigate({ to: '/client/company/$companyName/commodity/create', params: { companyName } })
+    navigate({ to: '/client/company/$companyName/batch/create', params: { companyName } })
   }
 
-  if (isLoadingCompany || isLoadingCommodities) {
+  if (isLoadingCompany || isLoadingBatches) {
     return (
       <div className="px-6 pt-6 h-full bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
@@ -66,19 +64,20 @@ function RouteComponent() {
     );
   }
 
-  const commodities = commoditiesData?.commodities || [];
-  // Filter commodities based on search query
-  const filteredCommodities = searchQuery.trim() === '' 
-    ? commodities 
-    : commodities.filter((commodity: any) => 
-        commodity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        commodity.code.toLowerCase().includes(searchQuery.toLowerCase())
+  const batches = batchesData?.batches || [];
+  // Filter batches based on search query
+  const filteredBatches = searchQuery.trim() === '' 
+    ? batches 
+    : batches.filter((batch: any) => 
+        batch.lotCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        batch.commodity?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        batch.commodity?.code.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <div className="flex items-center space-x-10 mb-4">
-        <h1 className="text-2xl font-bold text-black">Komoditas</h1>
+        <h1 className="text-2xl font-bold text-black">Batch</h1>
         
         <div>
           <form onSubmit={handleSearch} className=''>
@@ -112,52 +111,59 @@ function RouteComponent() {
             <col className="w-[200px]" />
             <col className="w-[150px]" />
             <col className="w-[150px]" />
+            <col className="w-[150px]" />
             <col className="w-[100px]" />
             <col className="w-auto" />
           </colgroup>
           
           <thead>
             <tr className="border border-gray-200 bg-gray-100">
-              <th className="text-left py-3 pl-5 pr-1 text-sm font-medium text-black">Nama</th>
-              <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Kode</th>
-              <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Jumlah Batch</th>
+              <th className="text-left py-3 pl-5 pr-1 text-sm font-medium text-black">Lot Code</th>
+              <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Komoditas</th>
+              <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Tanggal Panen</th>
+              <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Total (Kg)</th>
               <th className="text-left py-3 pl-1 pr-2 text-sm font-medium text-black">Aksi</th>
               <th className="py-3"></th>
             </tr>
           </thead>
           
           <tbody>
-            {filteredCommodities.length === 0 ? (
+            {filteredBatches.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-8 px-2 text-center text-gray-500">
-                  {searchQuery.trim() === '' ? 'Tidak ada komoditas' : 'Tidak ada komoditas yang ditemukan'}
+                <td colSpan={6} className="py-8 px-2 text-center text-gray-500">
+                  {searchQuery.trim() === '' ? 'Tidak ada batch' : 'Tidak ada batch yang ditemukan'}
                 </td>
               </tr>
             ) : (
-              filteredCommodities.map((commodity: any) => (
-                <tr key={commodity.id} className="border-b border-gray-200">
+              filteredBatches.map((batch: any) => (
+                <tr key={batch.id} className="border-b border-gray-200">
                   <td className="py-3 pl-5 pr-1">
-                    <span className="text-sm text-black">{commodity.name}</span>
+                    <span className="text-sm text-black">{batch.lotCode}</span>
                   </td>
                   <td className="py-3 pl-1 pr-1">
-                    <span className="text-sm text-black">{commodity.code}</span>
+                    <span className="text-sm text-black">{batch.commodity?.name || '-'}</span>
                   </td>
                   <td className="py-3 pl-1 pr-1">
-                    <span className="text-sm text-black">{commodity.batches?.length || 0}</span>
+                    <span className="text-sm text-black">
+                      {new Date(batch.harvestDate).toLocaleDateString('id-ID')}
+                    </span>
+                  </td>
+                  <td className="py-3 pl-1 pr-1">
+                    <span className="text-sm text-black">{batch.totalKg}</span>
                   </td>
                   <td className="py-3 pl-1 pr-2">
                     <div className="flex items-center gap-2">
                       <Link
-                        to={"/client/company/$companyName/commodity/$commodityId" as any}
-                        params={{ companyName, commodityId: commodity.id } as any}
+                        to={"/client/company/$companyName/batch/$batchId" as any}
+                        params={{ companyName, batchId: batch.id } as any}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                         title="Lihat"
                       >
                         <Eye className="w-4 h-4 text-black" />
                       </Link>
                       <Link
-                        to={"/client/company/$companyName/commodity/$commodityId/edit" as any}
-                        params={{ companyName, commodityId: commodity.id } as any}
+                        to={"/client/company/$companyName/batch/$batchId/edit" as any}
+                        params={{ companyName, batchId: batch.id } as any}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                         title="Edit"
                       >

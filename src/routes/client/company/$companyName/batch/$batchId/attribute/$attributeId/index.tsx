@@ -1,18 +1,18 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
-import DetailHeader from '../../../../../../../component/headers/DetailHeader'
-import { queryKeys } from '../../../../../../../lib/query-keys'
+import DetailHeader from '../../../../../../../../component/headers/DetailHeader'
+import { queryKeys } from '../../../../../../../../lib/query-keys'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { server } from '../../../../../../../lib/api'
+import { server } from '../../../../../../../../lib/api'
 import { Loader2 } from 'lucide-react'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/worker/individual/$farmerId/',
+  '/client/company/$companyName/batch/$batchId/attribute/$attributeId/',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName, farmerId } = useParams({ from: '/client/company/$companyName/worker/individual/$farmerId/' })
+  const { companyName, batchId, attributeId } = useParams({ from: '/client/company/$companyName/batch/$batchId/attribute/$attributeId/' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -26,48 +26,49 @@ function RouteComponent() {
     },
   });
 
-  // Fetch farmer data
-  const { data: farmerData, isLoading, error } = useQuery({
-    queryKey: companyData?.company?.id ? queryKeys.company.farmerById(companyData.company.id, farmerId) : ['farmer', farmerId],
+  // Fetch batch attribute data
+  const { data: batchAttributeData, isLoading, error } = useQuery({
+    queryKey: companyData?.company?.id ? queryKeys.company.batchAttributeById(companyData.company.id, batchId, attributeId) : ['batchAttribute', attributeId],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
-      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).worker.individual({ farmerId }).get();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).batch({ batchId }).attribute({ attributeId }).get();
       if (error) throw error;
       return data;
     },
     enabled: !!companyData?.company?.id,
   })
 
-  const farmer = farmerData?.farmer
+  const batchAttribute = batchAttributeData?.batchAttribute
 
-  // Delete farmer mutation
+  // Delete batch attribute mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
       if (!companyData?.company?.id) throw new Error('Company not found');
-      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).worker.individual({ farmerId }).delete();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).batch({ batchId }).attribute({ attributeId }).delete();
       if (error) throw error;
       if ('error' in data && data.error) {
-        throw new Error((data.error as any).value?.error || 'Failed to delete farmer');
+        throw new Error((data.error as any).value?.error || 'Failed to delete batch attribute');
       }
       return data;
     },
     onSuccess: () => {
       if (companyData?.company?.id) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.company.farmers(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.batchAttributes(companyData.company.id, batchId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.batchById(companyData.company.id, batchId) });
       }
-      navigate({ to: '/client/company/$companyName/worker/individual', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/batch/$batchId', params: { companyName, batchId } });
     },
     onError: (err: Error) => {
-      alert(err.message || 'Gagal menghapus pekerja');
+      alert(err.message || 'Gagal menghapus attribute batch');
     },
   });
 
   const handleEdit = () => {
-    navigate({ to: '/client/company/$companyName/worker/individual/$farmerId/edit' as any, params: { companyName, farmerId } as any })
+    navigate({ to: '/client/company/$companyName/batch/$batchId/attribute/$attributeId/edit' as any, params: { companyName, batchId, attributeId } as any })
   }
 
   const handleDelete = () => {
-    if (confirm('Apakah Anda yakin ingin menghapus pekerja ini?')) {
+    if (confirm('Apakah Anda yakin ingin menghapus attribute batch ini?')) {
       deleteMutation.mutate();
     }
   }
@@ -80,11 +81,11 @@ function RouteComponent() {
     )
   }
 
-  if (error || !farmer) {
+  if (error || !batchAttribute) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error: {(error as Error)?.message || 'Pekerja tidak ditemukan'}</p>
+          <p className="text-red-800">Error: {(error as Error)?.message || 'Attribute batch tidak ditemukan'}</p>
         </div>
       </div>
     )
@@ -93,51 +94,47 @@ function RouteComponent() {
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader 
-        title={`Lihat Pekerja: ${farmer.firstName} ${farmer.lastName}`} 
+        title={`Lihat Attribute Batch`} 
         handleDelete={handleDelete} 
         handleEdit={handleEdit} 
       />
 
       <div className="space-y-6">
-        {/* Farmer Information */}
+        {/* Batch Attribute Information */}
         <div className="w-[400px] space-y-4">
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              Nama Lengkap
+              Batch
             </label>
-            <p className='text-sm'>{farmer.firstName} {farmer.lastName}</p>
+            <p className='text-sm'>{batchAttribute.batch?.lotCode || '-'}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              NIK
+              Key
             </label>
-            <p className='text-sm'>{farmer.nationalId}</p>
+            <p className='text-sm'>{batchAttribute.key}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              Nomor Telepon
+              Value
             </label>
-            <p className='text-sm'>{farmer.phoneNumber}</p>
-          </div>
-
-    <div>
-            <label className="block text-sm font-medium text-black mb-2">
-              Alamat
-            </label>
-            <p className='text-sm'>{farmer.address}</p>
+            <p className='text-sm'>{batchAttribute.value}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              Kelompok
+              Unit
             </label>
-            <p className='text-sm'>
-              {farmer.farmerGroups && farmer.farmerGroups.length > 0
-                ? farmer.farmerGroups.map((g: any) => g.name).join(', ')
-                : '-'}
-            </p>
+            <p className='text-sm'>{batchAttribute.unit || '-'}</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">
+              Recorded At
+            </label>
+            <p className='text-sm'>{new Date(batchAttribute.recordedAt).toLocaleString('id-ID')}</p>
           </div>
         </div>
       </div>

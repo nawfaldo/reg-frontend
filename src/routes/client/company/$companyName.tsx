@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { User, Settings, Building2, Loader2, MapPin, Pickaxe, Bean } from 'lucide-react'
+import { User, Settings, Building2, Loader2, MapPin, Pickaxe, Bean, Tractor } from 'lucide-react'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { server } from '../../../lib/api'
 import { queryKeys } from '../../../lib/query-keys'
@@ -88,6 +88,14 @@ function RouteComponent() {
           >
             <MapPin className="w-[20px] h-[20px]" />
             <span>Lahan</span>
+          </Link>
+          <Link
+            to="/client/company/$companyName/batch"
+            params={{ companyName: company.name }}
+            className="flex items-center gap-3 text-sm text-black mb-5"
+          >
+            <Tractor className="w-[20px] h-[20px]" />
+            <span>Produksi</span>
           </Link>
           <Link
             to="/client/company/$companyName/commodity"

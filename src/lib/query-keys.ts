@@ -22,6 +22,12 @@ export const queryKeys = {
     farmerGroupById: (companyId: string, groupId: string) => ["company", companyId, "farmerGroups", groupId] as const,
     commodities: (companyId: string) => ["company", companyId, "commodities"] as const,
     commodityById: (companyId: string, commodityId: string) => ["company", companyId, "commodities", commodityId] as const,
+    batches: (companyId: string) => ["company", companyId, "batches"] as const,
+    batchById: (companyId: string, batchId: string) => ["company", companyId, "batches", batchId] as const,
+    batchSources: (companyId: string, batchId: string) => ["company", companyId, "batches", batchId, "sources"] as const,
+    batchSourceById: (companyId: string, batchId: string, sourceId: string) => ["company", companyId, "batches", batchId, "sources", sourceId] as const,
+    batchAttributes: (companyId: string, batchId: string) => ["company", companyId, "batches", batchId, "attributes"] as const,
+    batchAttributeById: (companyId: string, batchId: string, attributeId: string) => ["company", companyId, "batches", batchId, "attributes", attributeId] as const,
   },
 } as const;
 
