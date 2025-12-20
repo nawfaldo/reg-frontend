@@ -1236,6 +1236,259 @@ declare const app: Elysia<"", {
 } & {
     api: {
         company: {
+            ":id": {
+                commodity: {
+                    get: {
+                        body: unknown;
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                commodities?: undefined;
+                            } | {
+                                commodities: ({
+                                    batches: {
+                                        id: string;
+                                        lotCode: string;
+                                        harvestDate: Date;
+                                        totalKg: number;
+                                    }[];
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    name: string;
+                                    code: string;
+                                })[];
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                commodity: {
+                    ":commodityId": {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                commodityId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    commodity?: undefined;
+                                } | {
+                                    commodity: {
+                                        batches: ({
+                                            batchSources: ({
+                                                land: {
+                                                    id: string;
+                                                    name: string;
+                                                    location: string;
+                                                };
+                                                farmerGroup: {
+                                                    id: string;
+                                                    name: string;
+                                                };
+                                            } & {
+                                                id: string;
+                                                createdAt: Date;
+                                                landId: string;
+                                                farmerGroupId: string;
+                                                batchId: string;
+                                                volumeKg: number;
+                                                landSnapshot: import("@prisma/client/runtime/client").JsonValue;
+                                            })[];
+                                            batchAttributes: {
+                                                id: string;
+                                                recordedAt: Date;
+                                                key: string;
+                                                value: string;
+                                                unit: string | null;
+                                            }[];
+                                        } & {
+                                            id: string;
+                                            createdAt: Date;
+                                            commodityId: string;
+                                            lotCode: string;
+                                            harvestDate: Date;
+                                            totalKg: number;
+                                        })[];
+                                    } & {
+                                        id: string;
+                                        createdAt: Date;
+                                        name: string;
+                                        code: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                commodity: {
+                    post: {
+                        body: {
+                            name: string;
+                            code: string;
+                        };
+                        params: {
+                            id: string;
+                        } & {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: {
+                                error: string;
+                                commodity?: undefined;
+                            } | {
+                                commodity: {
+                                    batches: {
+                                        id: string;
+                                        lotCode: string;
+                                        harvestDate: Date;
+                                        totalKg: number;
+                                    }[];
+                                } & {
+                                    id: string;
+                                    createdAt: Date;
+                                    name: string;
+                                    code: string;
+                                };
+                                error?: undefined;
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                commodity: {
+                    ":commodityId": {
+                        put: {
+                            body: {
+                                name?: string | undefined;
+                                code?: string | undefined;
+                            };
+                            params: {
+                                id: string;
+                                commodityId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    commodity?: undefined;
+                                } | {
+                                    commodity: {
+                                        batches: {
+                                            id: string;
+                                            lotCode: string;
+                                            harvestDate: Date;
+                                            totalKg: number;
+                                        }[];
+                                    } & {
+                                        id: string;
+                                        createdAt: Date;
+                                        name: string;
+                                        code: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                commodity: {
+                    ":commodityId": {
+                        delete: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                                commodityId: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    success?: undefined;
+                                    message?: undefined;
+                                } | {
+                                    success: boolean;
+                                    message: string;
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
             permissions: {
                 get: {
                     body: unknown;

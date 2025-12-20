@@ -25,18 +25,22 @@ import { Route as ClientCompaniesCreateRouteImport } from './routes/client/compa
 import { Route as ClientCompanyCompanyNameSettingRouteImport } from './routes/client/company/$companyName/setting'
 import { Route as ClientCompanyCompanyNameBillingRouteImport } from './routes/client/company/$companyName/billing'
 import { Route as ClientCompanyCompanyNameGeoTagIndexRouteImport } from './routes/client/company/$companyName/geo-tag/index'
+import { Route as ClientCompanyCompanyNameCommodityIndexRouteImport } from './routes/client/company/$companyName/commodity/index'
 import { Route as ClientCompanyCompanyNameMemberPermissionRouteImport } from './routes/client/company/$companyName/member/permission'
 import { Route as ClientCompanyCompanyNameGeoTagCreateRouteImport } from './routes/client/company/$companyName/geo-tag/create'
+import { Route as ClientCompanyCompanyNameCommodityCreateRouteImport } from './routes/client/company/$companyName/commodity/create'
 import { Route as ClientCompanyCompanyNameWorkerIndividualIndexRouteImport } from './routes/client/company/$companyName/worker/individual/index'
 import { Route as ClientCompanyCompanyNameWorkerGroupIndexRouteImport } from './routes/client/company/$companyName/worker/group/index'
 import { Route as ClientCompanyCompanyNameMemberUserIndexRouteImport } from './routes/client/company/$companyName/member/user/index'
 import { Route as ClientCompanyCompanyNameMemberRoleIndexRouteImport } from './routes/client/company/$companyName/member/role/index'
 import { Route as ClientCompanyCompanyNameGeoTagLandIdIndexRouteImport } from './routes/client/company/$companyName/geo-tag/$landId/index'
+import { Route as ClientCompanyCompanyNameCommodityCommodityIdIndexRouteImport } from './routes/client/company/$companyName/commodity/$commodityId/index'
 import { Route as ClientCompanyCompanyNameWorkerIndividualCreateRouteImport } from './routes/client/company/$companyName/worker/individual/create'
 import { Route as ClientCompanyCompanyNameWorkerGroupCreateRouteImport } from './routes/client/company/$companyName/worker/group/create'
 import { Route as ClientCompanyCompanyNameMemberUserCreateRouteImport } from './routes/client/company/$companyName/member/user/create'
 import { Route as ClientCompanyCompanyNameMemberRoleCreateRouteImport } from './routes/client/company/$companyName/member/role/create'
 import { Route as ClientCompanyCompanyNameGeoTagLandIdEditRouteImport } from './routes/client/company/$companyName/geo-tag/$landId/edit'
+import { Route as ClientCompanyCompanyNameCommodityCommodityIdEditRouteImport } from './routes/client/company/$companyName/commodity/$commodityId/edit'
 import { Route as ClientCompanyCompanyNameWorkerIndividualFarmerIdIndexRouteImport } from './routes/client/company/$companyName/worker/individual/$farmerId/index'
 import { Route as ClientCompanyCompanyNameWorkerGroupFarmerGroupIdIndexRouteImport } from './routes/client/company/$companyName/worker/group/$farmerGroupId/index'
 import { Route as ClientCompanyCompanyNameMemberUserUserIdIndexRouteImport } from './routes/client/company/$companyName/member/user/$userId/index'
@@ -130,6 +134,12 @@ const ClientCompanyCompanyNameGeoTagIndexRoute =
     path: '/geo-tag/',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
+const ClientCompanyCompanyNameCommodityIndexRoute =
+  ClientCompanyCompanyNameCommodityIndexRouteImport.update({
+    id: '/commodity/',
+    path: '/commodity/',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
 const ClientCompanyCompanyNameMemberPermissionRoute =
   ClientCompanyCompanyNameMemberPermissionRouteImport.update({
     id: '/member/permission',
@@ -140,6 +150,12 @@ const ClientCompanyCompanyNameGeoTagCreateRoute =
   ClientCompanyCompanyNameGeoTagCreateRouteImport.update({
     id: '/geo-tag/create',
     path: '/geo-tag/create',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
+const ClientCompanyCompanyNameCommodityCreateRoute =
+  ClientCompanyCompanyNameCommodityCreateRouteImport.update({
+    id: '/commodity/create',
+    path: '/commodity/create',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
 const ClientCompanyCompanyNameWorkerIndividualIndexRoute =
@@ -172,6 +188,12 @@ const ClientCompanyCompanyNameGeoTagLandIdIndexRoute =
     path: '/geo-tag/$landId/',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
+const ClientCompanyCompanyNameCommodityCommodityIdIndexRoute =
+  ClientCompanyCompanyNameCommodityCommodityIdIndexRouteImport.update({
+    id: '/commodity/$commodityId/',
+    path: '/commodity/$commodityId/',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
 const ClientCompanyCompanyNameWorkerIndividualCreateRoute =
   ClientCompanyCompanyNameWorkerIndividualCreateRouteImport.update({
     id: '/worker/individual/create',
@@ -200,6 +222,12 @@ const ClientCompanyCompanyNameGeoTagLandIdEditRoute =
   ClientCompanyCompanyNameGeoTagLandIdEditRouteImport.update({
     id: '/geo-tag/$landId/edit',
     path: '/geo-tag/$landId/edit',
+    getParentRoute: () => ClientCompanyCompanyNameRoute,
+  } as any)
+const ClientCompanyCompanyNameCommodityCommodityIdEditRoute =
+  ClientCompanyCompanyNameCommodityCommodityIdEditRouteImport.update({
+    id: '/commodity/$commodityId/edit',
+    path: '/commodity/$commodityId/edit',
     getParentRoute: () => ClientCompanyCompanyNameRoute,
   } as any)
 const ClientCompanyCompanyNameWorkerIndividualFarmerIdIndexRoute =
@@ -267,14 +295,18 @@ export interface FileRoutesByFullPath {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/commodity/create': typeof ClientCompanyCompanyNameCommodityCreateRoute
   '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/commodity': typeof ClientCompanyCompanyNameCommodityIndexRoute
   '/client/company/$companyName/geo-tag': typeof ClientCompanyCompanyNameGeoTagIndexRoute
+  '/client/company/$companyName/commodity/$commodityId/edit': typeof ClientCompanyCompanyNameCommodityCommodityIdEditRoute
   '/client/company/$companyName/geo-tag/$landId/edit': typeof ClientCompanyCompanyNameGeoTagLandIdEditRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/worker/group/create': typeof ClientCompanyCompanyNameWorkerGroupCreateRoute
   '/client/company/$companyName/worker/individual/create': typeof ClientCompanyCompanyNameWorkerIndividualCreateRoute
+  '/client/company/$companyName/commodity/$commodityId': typeof ClientCompanyCompanyNameCommodityCommodityIdIndexRoute
   '/client/company/$companyName/geo-tag/$landId': typeof ClientCompanyCompanyNameGeoTagLandIdIndexRoute
   '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
   '/client/company/$companyName/member/user': typeof ClientCompanyCompanyNameMemberUserIndexRoute
@@ -305,14 +337,18 @@ export interface FileRoutesByTo {
   '/client/profile': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/commodity/create': typeof ClientCompanyCompanyNameCommodityCreateRoute
   '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/commodity': typeof ClientCompanyCompanyNameCommodityIndexRoute
   '/client/company/$companyName/geo-tag': typeof ClientCompanyCompanyNameGeoTagIndexRoute
+  '/client/company/$companyName/commodity/$commodityId/edit': typeof ClientCompanyCompanyNameCommodityCommodityIdEditRoute
   '/client/company/$companyName/geo-tag/$landId/edit': typeof ClientCompanyCompanyNameGeoTagLandIdEditRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/worker/group/create': typeof ClientCompanyCompanyNameWorkerGroupCreateRoute
   '/client/company/$companyName/worker/individual/create': typeof ClientCompanyCompanyNameWorkerIndividualCreateRoute
+  '/client/company/$companyName/commodity/$commodityId': typeof ClientCompanyCompanyNameCommodityCommodityIdIndexRoute
   '/client/company/$companyName/geo-tag/$landId': typeof ClientCompanyCompanyNameGeoTagLandIdIndexRoute
   '/client/company/$companyName/member/role': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
   '/client/company/$companyName/member/user': typeof ClientCompanyCompanyNameMemberUserIndexRoute
@@ -344,14 +380,18 @@ export interface FileRoutesById {
   '/client/profile/': typeof ClientProfileIndexRoute
   '/client/company/$companyName/billing': typeof ClientCompanyCompanyNameBillingRoute
   '/client/company/$companyName/setting': typeof ClientCompanyCompanyNameSettingRoute
+  '/client/company/$companyName/commodity/create': typeof ClientCompanyCompanyNameCommodityCreateRoute
   '/client/company/$companyName/geo-tag/create': typeof ClientCompanyCompanyNameGeoTagCreateRoute
   '/client/company/$companyName/member/permission': typeof ClientCompanyCompanyNameMemberPermissionRoute
+  '/client/company/$companyName/commodity/': typeof ClientCompanyCompanyNameCommodityIndexRoute
   '/client/company/$companyName/geo-tag/': typeof ClientCompanyCompanyNameGeoTagIndexRoute
+  '/client/company/$companyName/commodity/$commodityId/edit': typeof ClientCompanyCompanyNameCommodityCommodityIdEditRoute
   '/client/company/$companyName/geo-tag/$landId/edit': typeof ClientCompanyCompanyNameGeoTagLandIdEditRoute
   '/client/company/$companyName/member/role/create': typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   '/client/company/$companyName/member/user/create': typeof ClientCompanyCompanyNameMemberUserCreateRoute
   '/client/company/$companyName/worker/group/create': typeof ClientCompanyCompanyNameWorkerGroupCreateRoute
   '/client/company/$companyName/worker/individual/create': typeof ClientCompanyCompanyNameWorkerIndividualCreateRoute
+  '/client/company/$companyName/commodity/$commodityId/': typeof ClientCompanyCompanyNameCommodityCommodityIdIndexRoute
   '/client/company/$companyName/geo-tag/$landId/': typeof ClientCompanyCompanyNameGeoTagLandIdIndexRoute
   '/client/company/$companyName/member/role/': typeof ClientCompanyCompanyNameMemberRoleIndexRoute
   '/client/company/$companyName/member/user/': typeof ClientCompanyCompanyNameMemberUserIndexRoute
@@ -384,14 +424,18 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/commodity/create'
     | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/commodity'
     | '/client/company/$companyName/geo-tag'
+    | '/client/company/$companyName/commodity/$commodityId/edit'
     | '/client/company/$companyName/geo-tag/$landId/edit'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/worker/group/create'
     | '/client/company/$companyName/worker/individual/create'
+    | '/client/company/$companyName/commodity/$commodityId'
     | '/client/company/$companyName/geo-tag/$landId'
     | '/client/company/$companyName/member/role'
     | '/client/company/$companyName/member/user'
@@ -422,14 +466,18 @@ export interface FileRouteTypes {
     | '/client/profile'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/commodity/create'
     | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/commodity'
     | '/client/company/$companyName/geo-tag'
+    | '/client/company/$companyName/commodity/$commodityId/edit'
     | '/client/company/$companyName/geo-tag/$landId/edit'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/worker/group/create'
     | '/client/company/$companyName/worker/individual/create'
+    | '/client/company/$companyName/commodity/$commodityId'
     | '/client/company/$companyName/geo-tag/$landId'
     | '/client/company/$companyName/member/role'
     | '/client/company/$companyName/member/user'
@@ -460,14 +508,18 @@ export interface FileRouteTypes {
     | '/client/profile/'
     | '/client/company/$companyName/billing'
     | '/client/company/$companyName/setting'
+    | '/client/company/$companyName/commodity/create'
     | '/client/company/$companyName/geo-tag/create'
     | '/client/company/$companyName/member/permission'
+    | '/client/company/$companyName/commodity/'
     | '/client/company/$companyName/geo-tag/'
+    | '/client/company/$companyName/commodity/$commodityId/edit'
     | '/client/company/$companyName/geo-tag/$landId/edit'
     | '/client/company/$companyName/member/role/create'
     | '/client/company/$companyName/member/user/create'
     | '/client/company/$companyName/worker/group/create'
     | '/client/company/$companyName/worker/individual/create'
+    | '/client/company/$companyName/commodity/$commodityId/'
     | '/client/company/$companyName/geo-tag/$landId/'
     | '/client/company/$companyName/member/role/'
     | '/client/company/$companyName/member/user/'
@@ -608,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagIndexRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
+    '/client/company/$companyName/commodity/': {
+      id: '/client/company/$companyName/commodity/'
+      path: '/commodity'
+      fullPath: '/client/company/$companyName/commodity'
+      preLoaderRoute: typeof ClientCompanyCompanyNameCommodityIndexRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
     '/client/company/$companyName/member/permission': {
       id: '/client/company/$companyName/member/permission'
       path: '/member/permission'
@@ -620,6 +679,13 @@ declare module '@tanstack/react-router' {
       path: '/geo-tag/create'
       fullPath: '/client/company/$companyName/geo-tag/create'
       preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagCreateRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
+    '/client/company/$companyName/commodity/create': {
+      id: '/client/company/$companyName/commodity/create'
+      path: '/commodity/create'
+      fullPath: '/client/company/$companyName/commodity/create'
+      preLoaderRoute: typeof ClientCompanyCompanyNameCommodityCreateRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
     '/client/company/$companyName/worker/individual/': {
@@ -657,6 +723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagLandIdIndexRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
+    '/client/company/$companyName/commodity/$commodityId/': {
+      id: '/client/company/$companyName/commodity/$commodityId/'
+      path: '/commodity/$commodityId'
+      fullPath: '/client/company/$companyName/commodity/$commodityId'
+      preLoaderRoute: typeof ClientCompanyCompanyNameCommodityCommodityIdIndexRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
     '/client/company/$companyName/worker/individual/create': {
       id: '/client/company/$companyName/worker/individual/create'
       path: '/worker/individual/create'
@@ -690,6 +763,13 @@ declare module '@tanstack/react-router' {
       path: '/geo-tag/$landId/edit'
       fullPath: '/client/company/$companyName/geo-tag/$landId/edit'
       preLoaderRoute: typeof ClientCompanyCompanyNameGeoTagLandIdEditRouteImport
+      parentRoute: typeof ClientCompanyCompanyNameRoute
+    }
+    '/client/company/$companyName/commodity/$commodityId/edit': {
+      id: '/client/company/$companyName/commodity/$commodityId/edit'
+      path: '/commodity/$commodityId/edit'
+      fullPath: '/client/company/$companyName/commodity/$commodityId/edit'
+      preLoaderRoute: typeof ClientCompanyCompanyNameCommodityCommodityIdEditRouteImport
       parentRoute: typeof ClientCompanyCompanyNameRoute
     }
     '/client/company/$companyName/worker/individual/$farmerId/': {
@@ -754,14 +834,18 @@ declare module '@tanstack/react-router' {
 interface ClientCompanyCompanyNameRouteChildren {
   ClientCompanyCompanyNameBillingRoute: typeof ClientCompanyCompanyNameBillingRoute
   ClientCompanyCompanyNameSettingRoute: typeof ClientCompanyCompanyNameSettingRoute
+  ClientCompanyCompanyNameCommodityCreateRoute: typeof ClientCompanyCompanyNameCommodityCreateRoute
   ClientCompanyCompanyNameGeoTagCreateRoute: typeof ClientCompanyCompanyNameGeoTagCreateRoute
   ClientCompanyCompanyNameMemberPermissionRoute: typeof ClientCompanyCompanyNameMemberPermissionRoute
+  ClientCompanyCompanyNameCommodityIndexRoute: typeof ClientCompanyCompanyNameCommodityIndexRoute
   ClientCompanyCompanyNameGeoTagIndexRoute: typeof ClientCompanyCompanyNameGeoTagIndexRoute
+  ClientCompanyCompanyNameCommodityCommodityIdEditRoute: typeof ClientCompanyCompanyNameCommodityCommodityIdEditRoute
   ClientCompanyCompanyNameGeoTagLandIdEditRoute: typeof ClientCompanyCompanyNameGeoTagLandIdEditRoute
   ClientCompanyCompanyNameMemberRoleCreateRoute: typeof ClientCompanyCompanyNameMemberRoleCreateRoute
   ClientCompanyCompanyNameMemberUserCreateRoute: typeof ClientCompanyCompanyNameMemberUserCreateRoute
   ClientCompanyCompanyNameWorkerGroupCreateRoute: typeof ClientCompanyCompanyNameWorkerGroupCreateRoute
   ClientCompanyCompanyNameWorkerIndividualCreateRoute: typeof ClientCompanyCompanyNameWorkerIndividualCreateRoute
+  ClientCompanyCompanyNameCommodityCommodityIdIndexRoute: typeof ClientCompanyCompanyNameCommodityCommodityIdIndexRoute
   ClientCompanyCompanyNameGeoTagLandIdIndexRoute: typeof ClientCompanyCompanyNameGeoTagLandIdIndexRoute
   ClientCompanyCompanyNameMemberRoleIndexRoute: typeof ClientCompanyCompanyNameMemberRoleIndexRoute
   ClientCompanyCompanyNameMemberUserIndexRoute: typeof ClientCompanyCompanyNameMemberUserIndexRoute
@@ -781,12 +865,18 @@ const ClientCompanyCompanyNameRouteChildren: ClientCompanyCompanyNameRouteChildr
   {
     ClientCompanyCompanyNameBillingRoute: ClientCompanyCompanyNameBillingRoute,
     ClientCompanyCompanyNameSettingRoute: ClientCompanyCompanyNameSettingRoute,
+    ClientCompanyCompanyNameCommodityCreateRoute:
+      ClientCompanyCompanyNameCommodityCreateRoute,
     ClientCompanyCompanyNameGeoTagCreateRoute:
       ClientCompanyCompanyNameGeoTagCreateRoute,
     ClientCompanyCompanyNameMemberPermissionRoute:
       ClientCompanyCompanyNameMemberPermissionRoute,
+    ClientCompanyCompanyNameCommodityIndexRoute:
+      ClientCompanyCompanyNameCommodityIndexRoute,
     ClientCompanyCompanyNameGeoTagIndexRoute:
       ClientCompanyCompanyNameGeoTagIndexRoute,
+    ClientCompanyCompanyNameCommodityCommodityIdEditRoute:
+      ClientCompanyCompanyNameCommodityCommodityIdEditRoute,
     ClientCompanyCompanyNameGeoTagLandIdEditRoute:
       ClientCompanyCompanyNameGeoTagLandIdEditRoute,
     ClientCompanyCompanyNameMemberRoleCreateRoute:
@@ -797,6 +887,8 @@ const ClientCompanyCompanyNameRouteChildren: ClientCompanyCompanyNameRouteChildr
       ClientCompanyCompanyNameWorkerGroupCreateRoute,
     ClientCompanyCompanyNameWorkerIndividualCreateRoute:
       ClientCompanyCompanyNameWorkerIndividualCreateRoute,
+    ClientCompanyCompanyNameCommodityCommodityIdIndexRoute:
+      ClientCompanyCompanyNameCommodityCommodityIdIndexRoute,
     ClientCompanyCompanyNameGeoTagLandIdIndexRoute:
       ClientCompanyCompanyNameGeoTagLandIdIndexRoute,
     ClientCompanyCompanyNameMemberRoleIndexRoute:

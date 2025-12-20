@@ -20,6 +20,8 @@ export const queryKeys = {
     farmerById: (companyId: string, farmerId: string) => ["company", companyId, "farmers", farmerId] as const,
     farmerGroups: (companyId: string) => ["company", companyId, "farmerGroups"] as const,
     farmerGroupById: (companyId: string, groupId: string) => ["company", companyId, "farmerGroups", groupId] as const,
+    commodities: (companyId: string) => ["company", companyId, "commodities"] as const,
+    commodityById: (companyId: string, commodityId: string) => ["company", companyId, "commodities", commodityId] as const,
   },
 } as const;
 
