@@ -316,7 +316,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="px-6 pt-1 h-full bg-white">
+  <div className="px-6 pt-1 h-full bg-white">
       <EditHeader title={`Ubah Lahan: ${land.name}`} saveHandle={handleSave} />
 
       {error && (
@@ -486,7 +486,7 @@ function RouteComponent() {
             readOnly
             className="w-[400px] px-3 py-2 text-sm border border-gray-300 bg-gray-50 focus:outline-none"
           />
-        </div>
+  </div>
 
       </div>
     </div>

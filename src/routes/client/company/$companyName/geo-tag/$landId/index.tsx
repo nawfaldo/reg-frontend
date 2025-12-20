@@ -224,7 +224,7 @@ function GeoJSONLayer({ data }: { data: any }) {
   } catch (e) {
     console.error('Error parsing geoPolygon:', e)
   }
-
+  
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader 
@@ -303,7 +303,7 @@ function GeoJSONLayer({ data }: { data: any }) {
 
         {/* Map */}
         {geoJsonData && (
-          <div>
+    <div>
             <label className="block text-sm font-medium text-black mb-2">
               Peta Area Lahan
             </label>

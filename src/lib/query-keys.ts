@@ -16,6 +16,10 @@ export const queryKeys = {
     userSearch: (email: string) => ["company", "users", "search", email] as const,
     land: (companyId: string) => ["company", companyId, "land"] as const,
     landById: (companyId: string, landId: string) => ["company", companyId, "land", landId] as const,
+    farmers: (companyId: string) => ["company", companyId, "farmers"] as const,
+    farmerById: (companyId: string, farmerId: string) => ["company", companyId, "farmers", farmerId] as const,
+    farmerGroups: (companyId: string) => ["company", companyId, "farmerGroups"] as const,
+    farmerGroupById: (companyId: string, groupId: string) => ["company", companyId, "farmerGroups", groupId] as const,
   },
 } as const;
 

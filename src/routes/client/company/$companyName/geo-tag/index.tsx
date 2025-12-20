@@ -1,7 +1,8 @@
 import { Link, useParams } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2, Eye, Pencil } from 'lucide-react'
+import { useState } from 'react'
+import { Loader2, Eye, Pencil, Search } from 'lucide-react'
 import { server } from '../../../../../lib/api'
 import { queryKeys } from '../../../../../lib/query-keys'
 
@@ -11,6 +12,7 @@ export const Route = createFileRoute('/client/company/$companyName/geo-tag/')({
 
 function RouteComponent() {
   const { companyName } = useParams({ from: '/client/company/$companyName/geo-tag/' })
+  const [searchQuery, setSearchQuery] = useState('')
 
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
@@ -52,10 +54,47 @@ function RouteComponent() {
 
   const lands = landsData?.lands || [];
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by filtering lands below
+  };
+
+  // Filter lands based on search query
+  const filteredLands = lands.filter((land: any) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      land.name?.toLowerCase().includes(query) ||
+      land.location?.toLowerCase().includes(query) ||
+      land.latitude?.toString().includes(query) ||
+      land.longitude?.toString().includes(query)
+    );
+  });
+
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <div className="flex items-start justify-between mb-6">
+        <div className='flex space-x-[40px] items-center'>
         <h1 className="text-2xl font-bold text-black">Lahan</h1>
+        <form onSubmit={handleSearch} >
+                    <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Cari..."
+                        className="w-full pl-9 pr-16 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
+                    />
+                    <button
+                        type="submit"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 px-1 font-medium text-black text-sm bg-white border border-gray-300 border-b-5 hover:bg-gray-50 active:border-b-0 active:translate-y-1 transition-all"
+                    >
+                        Go!
+                    </button>
+                    </div>
+                </form>
+                </div>
         
         <div className="flex items-center gap-3">
           <Link
@@ -93,14 +132,14 @@ function RouteComponent() {
           </thead>
           
           <tbody>
-            {lands.length === 0 ? (
+            {filteredLands.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-8 px-2 text-center text-gray-500">
-                  Tidak ada lahan
+                  {lands.length === 0 ? 'Tidak ada lahan' : 'Tidak ada lahan yang cocok dengan pencarian'}
                 </td>
               </tr>
             ) : (
-              lands.map((land: any) => (
+              filteredLands.map((land: any) => (
                 <tr key={land.id} className="border-b border-gray-200">
                   <td className="py-3 pl-5 pr-1">
                     <span className="text-sm text-black">{land.name}</span>

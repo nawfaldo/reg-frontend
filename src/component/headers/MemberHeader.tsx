@@ -55,7 +55,7 @@ const MemberHeader = () => {
     return (
         <div className="pb-4">
             <div className="flex items-center space-x-10">
-            <h1 className="text-2xl font-bold text-black">Anggota</h1>
+            <h1 className="text-2xl font-bold text-black">Admin</h1>
             <div className="flex items-center gap-3 h-full">
                 {canViewUsers && (
                   <>
@@ -66,7 +66,7 @@ const MemberHeader = () => {
                     isUserPage ? 'border-b-2 border-black font-regular' : 'font-light border-b-2 border-transparent'
                 }`}
                 >
-                Anggota
+                Pengguna
                 </Link>
                     {(canViewRoles || canViewPermissions) && <div className="w-px h-3 bg-gray-300 self-center mt-[8px]"></div>}
                   </>

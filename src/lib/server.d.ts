@@ -754,6 +754,488 @@ declare const app: Elysia<"", {
 } & {
     api: {
         company: {
+            ":id": {
+                worker: {
+                    individual: {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    farmers?: undefined;
+                                } | {
+                                    farmers: {
+                                        farmerGroups: {
+                                            id: string;
+                                            name: string;
+                                        }[];
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        companyId: string;
+                                        firstName: string;
+                                        lastName: string;
+                                        nationalId: string;
+                                        phoneNumber: string;
+                                        address: string;
+                                    }[];
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    individual: {
+                        ":farmerId": {
+                            get: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    farmerId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        farmer?: undefined;
+                                    } | {
+                                        farmer: {
+                                            farmerGroups: {
+                                                id: string;
+                                                name: string;
+                                            }[];
+                                            id: string;
+                                            createdAt: Date;
+                                            updatedAt: Date;
+                                            companyId: string;
+                                            firstName: string;
+                                            lastName: string;
+                                            nationalId: string;
+                                            phoneNumber: string;
+                                            address: string;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    individual: {
+                        post: {
+                            body: {
+                                farmerGroupIds?: string[] | undefined;
+                                firstName: string;
+                                lastName: string;
+                                nationalId: string;
+                                phoneNumber: string;
+                                address: string;
+                            };
+                            params: {
+                                id: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    farmer?: undefined;
+                                } | {
+                                    farmer: {
+                                        farmerGroups: {
+                                            id: string;
+                                            name: string;
+                                        }[];
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        companyId: string;
+                                        firstName: string;
+                                        lastName: string;
+                                        nationalId: string;
+                                        phoneNumber: string;
+                                        address: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    individual: {
+                        ":farmerId": {
+                            put: {
+                                body: {
+                                    firstName?: string | undefined;
+                                    lastName?: string | undefined;
+                                    nationalId?: string | undefined;
+                                    phoneNumber?: string | undefined;
+                                    address?: string | undefined;
+                                    farmerGroupIds?: string[] | undefined;
+                                };
+                                params: {
+                                    id: string;
+                                    farmerId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        farmer?: undefined;
+                                    } | {
+                                        farmer: {
+                                            farmerGroups: {
+                                                id: string;
+                                                name: string;
+                                            }[];
+                                            id: string;
+                                            createdAt: Date;
+                                            updatedAt: Date;
+                                            companyId: string;
+                                            firstName: string;
+                                            lastName: string;
+                                            nationalId: string;
+                                            phoneNumber: string;
+                                            address: string;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    individual: {
+                        ":farmerId": {
+                            delete: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    farmerId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        success?: undefined;
+                                        message?: undefined;
+                                    } | {
+                                        success: boolean;
+                                        message: string;
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    group: {
+                        get: {
+                            body: unknown;
+                            params: {
+                                id: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    farmerGroups?: undefined;
+                                } | {
+                                    farmerGroups: {
+                                        farmers: {
+                                            id: string;
+                                            firstName: string;
+                                            lastName: string;
+                                            nationalId: string;
+                                        }[];
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                    }[];
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    group: {
+                        ":groupId": {
+                            get: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    groupId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        farmerGroup?: undefined;
+                                    } | {
+                                        farmerGroup: {
+                                            farmers: {
+                                                id: string;
+                                                firstName: string;
+                                                lastName: string;
+                                                nationalId: string;
+                                                phoneNumber: string;
+                                                address: string;
+                                            }[];
+                                            id: string;
+                                            createdAt: Date;
+                                            updatedAt: Date;
+                                            name: string;
+                                            companyId: string;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    group: {
+                        post: {
+                            body: {
+                                farmerIds?: string[] | undefined;
+                                name: string;
+                            };
+                            params: {
+                                id: string;
+                            } & {};
+                            query: unknown;
+                            headers: unknown;
+                            response: {
+                                200: {
+                                    error: string;
+                                    farmerGroup?: undefined;
+                                } | {
+                                    farmerGroup: {
+                                        farmers: {
+                                            id: string;
+                                            firstName: string;
+                                            lastName: string;
+                                            nationalId: string;
+                                        }[];
+                                        id: string;
+                                        createdAt: Date;
+                                        updatedAt: Date;
+                                        name: string;
+                                        companyId: string;
+                                    };
+                                    error?: undefined;
+                                };
+                                422: {
+                                    type: "validation";
+                                    on: string;
+                                    summary?: string;
+                                    message?: string;
+                                    found?: unknown;
+                                    property?: string;
+                                    expected?: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    group: {
+                        ":groupId": {
+                            put: {
+                                body: {
+                                    name?: string | undefined;
+                                    farmerIds?: string[] | undefined;
+                                };
+                                params: {
+                                    id: string;
+                                    groupId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        farmerGroup?: undefined;
+                                    } | {
+                                        farmerGroup: {
+                                            farmers: {
+                                                id: string;
+                                                firstName: string;
+                                                lastName: string;
+                                                nationalId: string;
+                                            }[];
+                                            id: string;
+                                            createdAt: Date;
+                                            updatedAt: Date;
+                                            name: string;
+                                            companyId: string;
+                                        };
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        } & {
+            ":id": {
+                worker: {
+                    group: {
+                        ":groupId": {
+                            delete: {
+                                body: unknown;
+                                params: {
+                                    id: string;
+                                    groupId: string;
+                                } & {};
+                                query: unknown;
+                                headers: unknown;
+                                response: {
+                                    200: {
+                                        error: string;
+                                        success?: undefined;
+                                        message?: undefined;
+                                    } | {
+                                        success: boolean;
+                                        message: string;
+                                        error?: undefined;
+                                    };
+                                    422: {
+                                        type: "validation";
+                                        on: string;
+                                        summary?: string;
+                                        message?: string;
+                                        found?: unknown;
+                                        property?: string;
+                                        expected?: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        company: {
             permissions: {
                 get: {
                     body: unknown;

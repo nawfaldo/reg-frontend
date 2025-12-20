@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User, Settings, Building2, Loader2, MapPin } from 'lucide-react'
-import { useState } from 'react'
+import { User, Settings, Building2, Loader2, MapPin, Pickaxe } from 'lucide-react'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { server } from '../../../lib/api'
 import { queryKeys } from '../../../lib/query-keys'
@@ -12,7 +11,6 @@ export const Route = createFileRoute('/client/company/$companyName')({
 
 function RouteComponent() {
   const { companyName } = useParams({ from: '/client/company/$companyName' })
-  const [searchQuery, setSearchQuery] = useState('')
 
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
@@ -25,11 +23,6 @@ function RouteComponent() {
 
   const company = data?.company;
   const { hasPermission, hasAnyMemberPermission } = usePermissions(companyName);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Search:', searchQuery)
-  }
 
   if (isLoading) {
     return (
@@ -78,30 +71,16 @@ function RouteComponent() {
           <h2 className="text-base font-semibold text-black flex-1">{company.name}</h2>
         </div>
 
-        {/* Search Bar */}
-        <div className="px-4 pt-4">
-          <form onSubmit={handleSearch}>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari..."
-                className="w-full pl-9 pr-16 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-1 font-medium text-black text-sm bg-white border border-gray-300 border-b-5 hover:bg-gray-50 active:border-b-0 active:translate-y-1 transition-all"
-              >
-                Go!
-              </button>
-            </div>
-          </form>
-        </div>
-
         {/* Menu Items */}
-        <nav className="flex-1 space-y-2 px-4 pt-4">
+        <nav className="flex-1 space-y-2 px-4 pt-6">
+        <Link
+            to="/client/company/$companyName/worker/group"
+            params={{ companyName: company.name }}
+            className="flex items-center gap-3 text-sm text-black mb-5"
+          >
+            <Pickaxe className="w-[17px] h-[17px]" />
+            <span>Pekerja</span>
+          </Link>
           <Link
             to="/client/company/$companyName/geo-tag"
             params={{ companyName: company.name }}
@@ -110,6 +89,7 @@ function RouteComponent() {
             <MapPin className="w-[20px] h-[20px]" />
             <span>Lahan</span>
           </Link>
+
           {hasAnyMemberPermission() && (
             hasPermission('member:user:view') ? (
               <Link
@@ -118,7 +98,7 @@ function RouteComponent() {
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
                 <User className="w-[20px] h-[20px]" />
-                <span>Anggota</span>
+                <span>Admin</span>
               </Link>
             ) : hasPermission('member:role:view') ? (
               <Link
@@ -127,7 +107,7 @@ function RouteComponent() {
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
                 <User className="w-[20px] h-[20px]" />
-                <span>Anggota</span>
+                <span>Admin</span>
               </Link>
             ) : hasPermission('member:permission:view') ? (
               <Link
@@ -136,7 +116,7 @@ function RouteComponent() {
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
                 <User className="w-[20px] h-[20px]" />
-                <span>Anggota</span>
+                <span>Admin</span>
               </Link>
             ) : null
           )}

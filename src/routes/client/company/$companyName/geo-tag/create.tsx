@@ -291,7 +291,7 @@ function RouteComponent() {
         </div>
       )}
 
-    <div className="space-y-6">
+<div className="space-y-6">
         {/* Name Input */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
@@ -308,9 +308,9 @@ function RouteComponent() {
 
         {/* GeoMapEditor */}
         <div>
-            <label className="block text-sm font-medium text-black mb-2">
-              Gambar Area Lahan
-            </label>
+          <label className="block text-sm font-medium text-black mb-2">
+            Gambar Area Lahan
+          </label>
             <div className="flex gap-2 items-start mb-3">
             <div className="relative flex-1 max-w-[400px] z-50">
               <input
