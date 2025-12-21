@@ -151,7 +151,6 @@ function RouteComponent() {
 
   const farmerGroups = farmerGroupsData?.farmerGroups || [];
   const isLoading = isLoadingCompany || isLoadingFarmer || isLoadingGroups;
-  const isLoadingFarmerName = isLoadingFarmer || !farmerData?.farmer;
 
   // Wait for loading to complete before checking permissions
   if (!isLoading && !hasPermission('worker:individual:update')) {

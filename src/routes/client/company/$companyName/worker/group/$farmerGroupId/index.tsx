@@ -42,7 +42,6 @@ function RouteComponent() {
 
   const farmerGroupData = groupData?.farmerGroup
   const isLoading = isLoadingCompany || isLoadingGroup
-  const isLoadingGroupName = isLoadingGroup || !farmerGroupData
 
   // Delete farmer group mutation
   const deleteMutation = useMutation({

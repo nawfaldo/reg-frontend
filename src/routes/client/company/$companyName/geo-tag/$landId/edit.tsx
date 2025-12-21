@@ -59,7 +59,6 @@ function RouteComponent() {
 
   const land = landData?.land
   const isLoading = isLoadingCompany || isLoadingLand
-  const isLoadingLandName = isLoadingLand || !land
 
   // Pre-fill form with existing data
   useEffect(() => {

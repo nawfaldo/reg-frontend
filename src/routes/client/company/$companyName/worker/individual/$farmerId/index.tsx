@@ -42,7 +42,6 @@ function RouteComponent() {
 
   const farmer = farmerData?.farmer
   const isLoading = isLoadingCompany || isLoadingFarmer
-  const isLoadingFarmerName = isLoadingFarmer || !farmer
 
   // Delete farmer mutation
   const deleteMutation = useMutation({

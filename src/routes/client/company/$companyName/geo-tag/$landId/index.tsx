@@ -59,7 +59,6 @@ function RouteComponent() {
 
   const land = landData?.land
   const isLoading = isLoadingCompany || isLoadingLand
-  const isLoadingLandName = isLoadingLand || !land
 
   // Check deforestation mutation
   const checkDeforestationMutation = useMutation({
