@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { authClient } from "../../../lib/auth-client";
 import { server } from "../../../lib/api";
 import { queryKeys } from "../../../lib/query-keys";
+import Skeleton from "../../../components/Skeleton";
 
 export const Route = createFileRoute('/client/profile/')({
   component: RouteComponent,
@@ -23,8 +24,51 @@ function RouteComponent() {
     window.location.reload();
   };
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
-  if (!userData?.user) return <div className="p-4">User not found</div>;
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="flex items-start justify-between mb-6">
+          <h1 className="text-2xl font-bold text-black">Profil</h1>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleLogout}
+              className="w-[90px] py-2 text-sm font-medium text-black bg-white border border-gray-300 border-b-7 hover:bg-gray-50 active:border-b-0 active:translate-y-1 transition-all"
+            >
+              Keluar
+            </button>
+            <Link
+              to="/client/profile/edit"
+              className="w-[90px] py-2 text-sm font-medium text-black bg-white border border-gray-300 border-b-7 hover:bg-gray-50 active:border-b-0 active:translate-y-1 transition-all text-center block"
+            >
+              Ubah
+            </Link>
+          </div>
+        </div>
+        
+        <div className="flex items-start gap-4">
+          <Skeleton width={100} height={100} borderRadius={25} />
+          <div className="space-y-2">
+            <Skeleton width={200} height={28} />
+            <Skeleton width={150} height={16} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData?.user) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="flex items-start justify-between mb-6">
+          <h1 className="text-2xl font-bold text-black">Profil</h1>
+        </div>
+        <div className="p-4">
+          <p className="text-gray-500">User not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 pt-1 h-full bg-white">

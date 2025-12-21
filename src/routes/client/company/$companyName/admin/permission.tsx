@@ -1,17 +1,17 @@
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-import MemberHeader from '../../../../../component/headers/MemberHeader';
+import AdminHeader from '../../../../../components/headers/AdminHeader';
 import { usePermissions } from '../../../../../hooks/usePermissions'
 import { server } from '../../../../../lib/api'
 import { queryKeys } from '../../../../../lib/query-keys'
+import Skeleton from '../../../../../components/Skeleton'
 
-export const Route = createFileRoute('/client/company/$companyName/member/permission')({
+export const Route = createFileRoute('/client/company/$companyName/admin/permission')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/member/permission' })
+  const { companyName } = useParams({ from: '/client/company/$companyName/admin/permission' })
   const { hasPermission } = usePermissions(companyName)
   
   const { data: permissionsData, isLoading, error } = useQuery({
@@ -23,10 +23,15 @@ function RouteComponent() {
     },
   });
 
-  if (isLoading) {
+  const permissions = permissionsData?.permissions || [];
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:permission:view')) {
     return (
-      <div className="px-6 pt-6 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-6 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk melihat daftar perizinan</p>
+        </div>
       </div>
     );
   }
@@ -41,21 +46,9 @@ function RouteComponent() {
     );
   }
 
-  if (!hasPermission('member:permission:view')) {
-    return (
-      <div className="px-6 pt-6 h-full bg-white">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Anda tidak memiliki izin untuk melihat daftar perizinan</p>
-        </div>
-      </div>
-    );
-  }
-
-  const permissions = permissionsData?.permissions || [];
-
   return (
     <div className="px-6 h-full bg-white">
-      <MemberHeader />
+      <AdminHeader isLoading={isLoading} />
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <colgroup>
@@ -71,7 +64,19 @@ function RouteComponent() {
           </thead>
           
           <tbody>
-            {permissions.length === 0 ? (
+            {isLoading ? (
+              // Show 3 skeleton rows while loading
+              Array.from({ length: 3 }).map((_, index) => (
+                <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                  <td className="py-3 pl-5 pr-1">
+                    <Skeleton width={120} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-2">
+                    <Skeleton width={200} height={16} />
+                  </td>
+                </tr>
+              ))
+            ) : permissions.length === 0 ? (
               <tr>
                 <td colSpan={2} className="py-8 px-2 text-center text-gray-500">
                   Tidak ada perizinan

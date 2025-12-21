@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2, CheckCircle2, Building2, ArrowRight, TriangleAlert } from 'lucide-react'
+import { CheckCircle2, Building2, ArrowRight, TriangleAlert } from 'lucide-react'
 import { server } from '../../../../lib/api'
 import { queryKeys } from '../../../../lib/query-keys'
+import Skeleton from '../../../../components/Skeleton'
 
 export const Route = createFileRoute('/client/company/$companyName/setting')({
   component: RouteComponent,
@@ -22,8 +23,21 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className="p-6 flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="flex items-start justify-between mb-6">
+          <h1 className="text-2xl font-bold text-black">Setting</h1>
+          <div className="flex items-center gap-3">
+            <Skeleton width={90} height={36} borderRadius={4} />
+            <Skeleton width={90} height={36} borderRadius={4} />
+          </div>
+        </div>
+        <div className="flex items-start gap-3">
+          <Skeleton width={100} height={100} borderRadius={30} />
+          <div className="space-y-2">
+            <Skeleton width={150} height={24} />
+            <Skeleton width={200} height={20} />
+          </div>
+        </div>
       </div>
     );
   }

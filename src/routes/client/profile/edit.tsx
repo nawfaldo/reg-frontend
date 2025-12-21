@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { server } from '../../../lib/api'
 import { queryKeys } from '../../../lib/query-keys'
 import { User, Camera } from 'lucide-react'
-import EditHeader from '../../../component/headers/EditHeader'
+import EditHeader from '../../../components/headers/EditHeader'
+import Skeleton from '../../../components/Skeleton'
+import SkeletonInput from '../../../components/inputs/SkeletonInput'
 
 export const Route = createFileRoute('/client/profile/edit')({
   component: RouteComponent,
@@ -94,17 +96,7 @@ function RouteComponent() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="p-6 h-full bg-white">
-        <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!userData?.user) {
+  if (!userData?.user && !isLoading) {
     return (
       <div className="p-6 h-full bg-white">
         <div className="flex items-center justify-center h-full">
@@ -114,12 +106,12 @@ function RouteComponent() {
     )
   }
 
-
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <EditHeader
         title="Ubah Profil" 
-        saveHandle={handleSave} 
+        saveHandle={handleSave}
+        isPending={updateMutation.isPending}
       />
       
       <div className="space-y-6">
@@ -128,23 +120,29 @@ function RouteComponent() {
             Gambar
           </label>
           <div className="relative">
-            <div 
-              onClick={handleImageClick}
-              className="w-[100px] h-[100px] rounded-[25px] overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors relative group"
-            >
-              {image ? (
-                <img
-                  src={image}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="w-12 h-12 text-gray-400" />
-              )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-                <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            {isLoading || !isInitialized ? (
+              <div className="w-[100px] h-[100px] rounded-[25px] overflow-hidden border border-gray-200">
+                <Skeleton width="100%" height="100%" borderRadius={25} />
               </div>
-            </div>
+            ) : (
+              <div 
+                onClick={handleImageClick}
+                className="w-[100px] h-[100px] rounded-[25px] overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors relative group"
+              >
+                {image ? (
+                  <img
+                    src={image}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-12 h-12 text-gray-400" />
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </div>
+              </div>
+            )}
             <input
               ref={fileInputRef}
               type="file"
@@ -155,17 +153,12 @@ function RouteComponent() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-bold text-black mb-3">
-            Nama
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full max-w-md px-3 py-2 border border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-          />
-        </div>
+        <SkeletonInput
+          label="Nama"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          isLoading={isLoading || !isInitialized}
+        />
       </div>
     </div>
   )

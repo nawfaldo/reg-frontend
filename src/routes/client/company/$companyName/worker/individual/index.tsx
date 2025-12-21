@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Eye, Pencil } from 'lucide-react'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
-import WorkerHeader from '../../../../../../component/headers/WorkerHeader'
+import WorkerHeader from '../../../../../../components/headers/WorkerHeader'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/worker/individual/',

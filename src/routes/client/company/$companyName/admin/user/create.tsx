@@ -2,19 +2,19 @@ import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Search, ChevronDown, X } from 'lucide-react'
-import CreateHeader from '../../../../../../component/headers/CreateHeader'
+import CreateHeader from '../../../../../../components/headers/CreateHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/member/user/create',
+  '/client/company/$companyName/admin/user/create',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/member/user/create' })
+  const { companyName } = useParams({ from: '/client/company/$companyName/admin/user/create' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { hasPermission } = usePermissions(companyName)
@@ -26,7 +26,7 @@ function RouteComponent() {
   const [isSearching, setIsSearching] = useState(false)
 
   // Fetch company ID
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -72,22 +72,22 @@ function RouteComponent() {
     mutationFn: async (data: { userId: string; roleIds: string[] }) => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).members.post({
+      const { data: response, error } = await (server.api.company as any)({ id: companyData.company.id }).admins.post({
         userId: data.userId,
         roleIds: data.roleIds,
       });
       if (error) throw error;
       if ('error' in response && response.error) {
-        throw new Error((response.error as any).value?.error || 'Failed to add member');
+        throw new Error((response.error as any).value?.error || 'Failed to add admin');
       }
       return response;
     },
     onSuccess: () => {
       if (companyData?.company?.id) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.company.members(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.admins(companyData.company.id) });
         queryClient.invalidateQueries({ queryKey: queryKeys.company.byId(companyData.company.id) });
       }
-      navigate({ to: '/client/company/$companyName/member/user', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/admin/user', params: { companyName } });
     },
     onError: (err: Error) => {
       setError(err.message);
@@ -146,8 +146,10 @@ function RouteComponent() {
     setSelectedRoleIds(selectedRoleIds.filter(id => id !== roleId));
   }
 
-  // Check permission to create user
-  if (!hasPermission('member:user:create')) {
+  const isLoading = isLoadingCompany || isLoadingRoles;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:user:create')) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -159,7 +161,11 @@ function RouteComponent() {
 
   return (
     <div className="px-6 pt-1 h-full bg-white">
-      <CreateHeader title="Tambah Anggota" createHandle={handleCreate} />
+      <CreateHeader 
+        title="Tambah Anggota" 
+        createHandle={handleCreate} 
+        isPending={createMutation.isPending}
+      />
       
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -189,11 +195,20 @@ function RouteComponent() {
             <button
               type="button"
               onClick={handleSearch}
-              disabled={isSearching}
+              disabled={isSearching || searchUserMutation.isPending}
               className="px-2 py-2 text-sm flex items-center gap-1 disabled:opacity-50"
             >
-              <Search className="w-4 h-4" />
-              <span className='underline'>Cari</span>
+              {searchUserMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  <span className='underline'>Mencari...</span>
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  <span className='underline'>Cari</span>
+                </>
+              )}
             </button>
           </div>
           {selectedUser && (
@@ -217,7 +232,7 @@ function RouteComponent() {
               <span className="text-gray-400">
                 Pilih peran
               </span>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? `rotate-180` : ``}`} />
             </button>
             
             {isDropdownOpen && (

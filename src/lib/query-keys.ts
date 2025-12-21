@@ -9,7 +9,7 @@ export const queryKeys = {
     companies: ["companies"] as const,
     byName: (name: string) => ["company", name] as const,
     byId: (id: string) => ["company", id] as const,
-    members: (companyId: string) => ["company", companyId, "members"] as const,
+    admins: (companyId: string) => ["company", companyId, "admins"] as const,
     roles: (companyId: string) => ["company", companyId, "roles"] as const,
     role: (companyId: string, roleId: string) => ["company", companyId, "roles", roleId] as const,
     permissions: ["company", "permissions"] as const,

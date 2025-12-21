@@ -1,19 +1,20 @@
 import { createFileRoute, useParams, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2, Eye, Pencil } from 'lucide-react'
-import MemberHeader from '../../../../../../component/headers/MemberHeader'
+import { Eye, Pencil } from 'lucide-react'
+import AdminHeader from '../../../../../../components/headers/AdminHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
+import Skeleton from '../../../../../../components/Skeleton'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/member/role/',
+  '/client/company/$companyName/admin/role/',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/member/role/' })
+  const { companyName } = useParams({ from: '/client/company/$companyName/admin/role/' })
   const { hasPermission } = usePermissions(companyName)
 
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
@@ -36,10 +37,16 @@ function RouteComponent() {
     enabled: !!companyData?.company?.id,
   });
 
-  if (isLoadingCompany || isLoadingRoles) {
+  const roles = rolesData?.roles || [];
+  const isLoading = isLoadingCompany || isLoadingRoles;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:role:view')) {
     return (
-      <div className="px-6 pt-6 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-6 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk melihat daftar peran</p>
+        </div>
       </div>
     );
   }
@@ -54,23 +61,9 @@ function RouteComponent() {
     );
   }
 
-  // Check permission to view roles - only check after company data is loaded
-  if (companyData?.company && !hasPermission('member:role:view')) {
-    return (
-      <div className="px-6 pt-6 h-full bg-white">
-        <MemberHeader />
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-          <p className="text-red-800">Anda tidak memiliki izin untuk melihat daftar peran</p>
-        </div>
-      </div>
-    );
-  }
-
-  const roles = rolesData?.roles || [];
-
   return (
     <div className="px-6 h-full bg-white">
-      <MemberHeader />
+      <AdminHeader isLoading={isLoading} />
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <colgroup>
@@ -88,7 +81,23 @@ function RouteComponent() {
           </thead>
           
           <tbody>
-            {roles.length === 0 ? (
+            {isLoading ? (
+              // Show 3 skeleton rows while loading
+              Array.from({ length: 3 }).map((_, index) => (
+                <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                  <td className="py-3 pl-5 pr-1">
+                    <Skeleton width={120} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-2">
+                    <div className="flex items-center gap-2">
+                      <Skeleton width={16} height={16} circle />
+                      <Skeleton width={16} height={16} circle />
+                    </div>
+                  </td>
+                  <td className="py-3"></td>
+                </tr>
+              ))
+            ) : roles.length === 0 ? (
               <tr>
                 <td colSpan={3} className="py-8 px-2 text-center text-gray-500">
                   Tidak ada peran
@@ -102,9 +111,9 @@ function RouteComponent() {
                   </td>
                   <td className="py-3 pl-1 pr-2">
                     <div className="flex items-center gap-2">
-                      {hasPermission('member:role:view') && (
+                      {hasPermission('admin:role:view') && (
                         <Link
-                          to="/client/company/$companyName/member/role/$roleId"
+                          to="/client/company/$companyName/admin/role/$roleId"
                           params={{ companyName, roleId: role.id }}
                           className="p-1 hover:bg-gray-100 rounded transition-colors"
                           title="Lihat"
@@ -112,9 +121,9 @@ function RouteComponent() {
                           <Eye className="w-4 h-4 text-black" />
                         </Link>
                       )}
-                      {hasPermission('member:role:update') && (
+                      {hasPermission('admin:role:update') && (
                         <Link
-                          to="/client/company/$companyName/member/role/$roleId/edit"
+                          to="/client/company/$companyName/admin/role/$roleId/edit"
                           params={{ companyName, roleId: role.id }}
                           className="p-1 hover:bg-gray-100 rounded transition-colors"
                           title="Edit"

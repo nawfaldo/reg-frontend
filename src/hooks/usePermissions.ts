@@ -24,7 +24,7 @@ export function usePermissions(companyName: string | undefined) {
     hasPermission: (permissionName: string) => hasPermission(permissions, permissionName, isOwner),
     hasAnyMemberPermission: () => {
       if (isOwner) return true;
-      return permissions.some((p: string) => p.startsWith('member:'));
+      return permissions.some((p: string) => p.startsWith('admin:'));
     },
   };
 }

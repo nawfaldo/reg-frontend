@@ -5,9 +5,10 @@ import PrimaryButton from '../buttons/PrimaryButton';
 interface CreateHeaderProps {
   title: string;
   createHandle: () => void;
+  isPending?: boolean;
 }
 
-export default function CreateHeader({ title, createHandle }: CreateHeaderProps) {
+export default function CreateHeader({ title, createHandle, isPending = false }: CreateHeaderProps) {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -28,7 +29,7 @@ export default function CreateHeader({ title, createHandle }: CreateHeaderProps)
         </div>
         
         <div className="flex items-center gap-3">
-          <PrimaryButton handle={createHandle} title="Simpan"/>
+          <PrimaryButton handle={createHandle} title={isPending ? "Menyimpan..." : "Simpan"} disabled={isPending} />
         </div>
       </div>
     </div>

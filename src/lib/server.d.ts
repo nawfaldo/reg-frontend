@@ -33,6 +33,45 @@ declare const app: Elysia<"", {
     macroFn: {};
     parser: {};
 }, {
+    "*": {
+        options: {
+            body: unknown;
+            params: {
+                "*": string;
+            } & {};
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: Response;
+                422: {
+                    type: "validation";
+                    on: string;
+                    summary?: string;
+                    message?: string;
+                    found?: unknown;
+                    property?: string;
+                    expected?: string;
+                };
+            };
+        };
+    };
+} & {
+    health: {
+        get: {
+            body: unknown;
+            params: {};
+            query: unknown;
+            headers: unknown;
+            response: {
+                200: {
+                    status: string;
+                    runtime: string;
+                    timestamp: string;
+                };
+            };
+        };
+    };
+} & {
     [x: string]: {
         get: {
             body: unknown;
@@ -402,7 +441,7 @@ declare const app: Elysia<"", {
     api: {
         company: {
             ":id": {
-                members: {
+                admins: {
                     post: {
                         body: {
                             userId: string;
@@ -438,7 +477,7 @@ declare const app: Elysia<"", {
             };
         } & {
             ":id": {
-                members: {
+                admin: {
                     ":userId": {
                         put: {
                             body: {
@@ -476,7 +515,7 @@ declare const app: Elysia<"", {
             };
         } & {
             ":id": {
-                members: {
+                admin: {
                     ":userId": {
                         delete: {
                             body: unknown;
@@ -2410,7 +2449,7 @@ declare const app: Elysia<"", {
                                 roles: string[];
                                 permissions: string[];
                                 hasActiveSubscription: boolean | "" | null;
-                                members: any[];
+                                admins: any[];
                                 users: ({
                                     user: {
                                         id: string;
@@ -2614,6 +2653,5 @@ declare const app: Elysia<"", {
     standaloneSchema: {};
     response: {};
 }>;
-declare const _default: any;
-export default _default;
 export type App = typeof app;
+export {};

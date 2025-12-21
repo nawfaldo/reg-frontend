@@ -2,19 +2,20 @@ import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ChevronDown, X } from 'lucide-react'
-import CreateHeader from '../../../../../../component/headers/CreateHeader'
+import CreateHeader from '../../../../../../components/headers/CreateHeader'
 import { usePermissions } from '../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
+import Skeleton from '../../../../../../components/Skeleton'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/member/role/create',
+  '/client/company/$companyName/admin/role/create',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName } = useParams({ from: '/client/company/$companyName/member/role/create' })
+  const { companyName } = useParams({ from: '/client/company/$companyName/admin/role/create' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { hasPermission } = usePermissions(companyName)
@@ -24,7 +25,7 @@ function RouteComponent() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   // Fetch company ID
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -58,7 +59,7 @@ function RouteComponent() {
       if (companyData?.company?.id) {
         queryClient.invalidateQueries({ queryKey: queryKeys.company.roles(companyData.company.id) });
       }
-      navigate({ to: '/client/company/$companyName/member/role', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/admin/role', params: { companyName } });
     },
     onError: (err: Error) => {
       setError(err.message);
@@ -98,8 +99,10 @@ function RouteComponent() {
     setSelectedPermissions(selectedPermissions.filter(id => id !== permissionId))
   }
 
-  // Check permission to create role
-  if (!hasPermission('member:role:create')) {
+  const isLoading = isLoadingCompany || isLoadingPermissions;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:role:create')) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -109,11 +112,34 @@ function RouteComponent() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <CreateHeader title="Buat Peran" createHandle={handleCreate} isPending={false} />
+        
+        <div className="space-y-6">
+          {/* Name Input Skeleton */}
+          <div>
+            <Skeleton width={60} height={20} className="mb-2" />
+            <Skeleton width={400} height={36} borderRadius={0} />
+          </div>
+          
+          {/* Permissions Select Skeleton */}
+          <div>
+            <Skeleton width={80} height={20} className="mb-2" />
+            <Skeleton width={400} height={36} borderRadius={0} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <CreateHeader
         title="Buat Peran" 
-        createHandle={handleCreate} 
+        createHandle={handleCreate}
+        isPending={createMutation.isPending}
       />
       
       {error && (

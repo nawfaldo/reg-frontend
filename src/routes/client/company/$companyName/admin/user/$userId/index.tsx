@@ -1,19 +1,20 @@
 import { createFileRoute, useParams, Link, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Eye } from 'lucide-react'
-import DetailHeader from '../../../../../../../component/headers/DetailHeader'
+import { Eye } from 'lucide-react'
+import DetailHeader from '../../../../../../../components/headers/DetailHeader'
 import { usePermissions } from '../../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../../lib/api'
 import { queryKeys } from '../../../../../../../lib/query-keys'
+import Skeleton from '../../../../../../../components/Skeleton'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/member/user/$userId/',
+  '/client/company/$companyName/admin/user/$userId/',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName, userId } = useParams({ from: '/client/company/$companyName/member/user/$userId/' })
+  const { companyName, userId } = useParams({ from: '/client/company/$companyName/admin/user/$userId/' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { hasPermission } = usePermissions(companyName)
@@ -28,9 +29,9 @@ function RouteComponent() {
     },
   });
 
-  // Fetch company members to get user details
-  const { data: membersData, isLoading: isLoadingMembers, error } = useQuery({
-    queryKey: companyData?.company?.id ? queryKeys.company.members(companyData.company.id) : ['company', companyData?.company?.id, 'members'],
+  // Fetch company admins to get user details
+  const { data: adminsData, isLoading: isLoadingAdmins, error } = useQuery({
+    queryKey: companyData?.company?.id ? queryKeys.company.admins(companyData.company.id) : ['company', companyData?.company?.id, 'admins'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
       const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).get();
@@ -44,18 +45,18 @@ function RouteComponent() {
     mutationFn: async () => {
       if (!companyData?.company?.id) throw new Error('Company not found');
       
-      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).members({ userId }).delete();
+      const { data, error } = await (server.api.company as any)({ id: companyData.company.id }).admins({ userId }).delete();
       if (error) throw error;
       if ('error' in data && data.error) {
-        throw new Error((data.error as any).value?.error || 'Failed to delete member');
+        throw new Error((data.error as any).value?.error || 'Failed to delete admin');
       }
       return data;
     },
     onSuccess: () => {
       if (companyData?.company?.id) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.company.members(companyData.company.id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.company.admins(companyData.company.id) });
       }
-      navigate({ to: '/client/company/$companyName/member/user', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/admin/user', params: { companyName } });
     },
     onError: (err: Error) => {
       alert(err.message);
@@ -63,7 +64,7 @@ function RouteComponent() {
   });
 
   const handleDelete = () => {
-    if (!hasPermission('member:user:delete')) {
+    if (!hasPermission('admin:user:delete')) {
       alert('Anda tidak memiliki izin untuk menghapus anggota');
       return;
     }
@@ -73,27 +74,83 @@ function RouteComponent() {
   }
   
   const handleEdit = () => {
-    if (!hasPermission('member:user:update')) {
+    if (!hasPermission('admin:user:update')) {
       alert('Anda tidak memiliki izin untuk mengubah anggota');
       return;
     }
-    navigate({ to: '/client/company/$companyName/member/user/$userId/edit', params: { companyName, userId } });
+    navigate({ to: '/client/company/$companyName/admin/user/$userId/edit', params: { companyName, userId } });
   }
 
-  if (isLoadingCompany || isLoadingMembers) {
-    return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  const isLoading = isLoadingCompany || isLoadingAdmins;
+  const admins = adminsData?.company?.admins || [];
+  const user = admins.find((admin: any) => admin.id === userId);
 
-  // Check permission to view user
-  if (!hasPermission('member:user:view')) {
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:user:view')) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Anda tidak memiliki izin untuk melihat detail anggota</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Anggota"
+          userName={undefined}
+          handleDelete={undefined}
+          handleEdit={undefined}
+          isLoading={true}
+          isLoadingUserName={isLoadingAdmins || !user}
+        />
+        
+        {/* User Info Skeleton */}
+        <div className="flex items-start gap-4">
+          <Skeleton width={100} height={100} borderRadius={25} />
+          <div className="space-y-2">
+            <Skeleton width={200} height={28} />
+            <Skeleton width={150} height={16} />
+          </div>
+        </div>
+
+        {/* Roles Table Skeleton */}
+        <div className="mt-8">
+          <Skeleton width={80} height={24} className="mb-4" />
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <colgroup>
+                <col className="w-[250px]" />
+                <col className="w-[100px]" />
+                <col className="w-auto" />
+              </colgroup>
+              
+              <thead>
+                <tr className="border border-gray-200 bg-gray-100">
+                  <th className="text-left py-3 pl-5 pr-1 text-sm font-medium text-black">Nama</th>
+                  <th className="text-left py-3 pl-1 pr-2 text-sm font-medium text-black">Aksi</th>
+                  <th className="py-3"></th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                    <td className="pl-5 pr-1 py-3">
+                      <Skeleton width={120} height={16} />
+                    </td>
+                    <td className="pl-1 pr-2 py-3">
+                      <Skeleton width={16} height={16} circle />
+                    </td>
+                    <td className="py-3"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
@@ -114,14 +171,11 @@ function RouteComponent() {
     );
   }
 
-  const members = membersData?.company?.members || [];
-  const user = members.find((member: any) => member.id === userId);
-
   if (!user) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <DetailHeader
-          title="Lihat Anggota"
+          title="Lihat Admin"
           handleDelete={handleDelete}
           handleEdit={handleEdit}
         />
@@ -135,9 +189,12 @@ function RouteComponent() {
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader
-        title={`Lihat Anggota: ${user.name}`}
-        handleDelete={hasPermission('member:user:delete') ? handleDelete : undefined}
-        handleEdit={hasPermission('member:user:update') ? handleEdit : undefined}
+        title="Lihat Admin"
+        userName={user.name}
+        handleDelete={hasPermission('admin:user:delete') ? handleDelete : undefined}
+        handleEdit={hasPermission('admin:user:update') ? handleEdit : undefined}
+        isLoading={false}
+        isLoadingUserName={false}
       />
 
       <div className="flex items-start gap-4">
@@ -185,9 +242,9 @@ function RouteComponent() {
                       <span className="text-sm text-black capitalize">{role.name}</span>
                     </td>
                     <td className="pl-1 pr-2">
-                      {hasPermission('member:role:view') && (
+                      {hasPermission('admin:role:view') && (
                         <Link
-                          to="/client/company/$companyName/member/role/$roleId"
+                          to="/client/company/$companyName/admin/role/$roleId"
                           params={{ companyName, roleId: role.id }}
                           className="p-1 hover:bg-gray-100 rounded transition-colors inline-block"
                           title="Lihat"

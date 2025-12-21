@@ -1,11 +1,11 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router'
-import DetailHeader from '../../../../../../component/headers/DetailHeader'
+import DetailHeader from '../../../../../../components/headers/DetailHeader'
 import { queryKeys } from '../../../../../../lib/query-keys'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
 import { Loader2, Search, Eye, Pencil } from 'lucide-react'
 import { useState } from 'react'
-import PrimaryButton from '../../../../../../component/buttons/PrimaryButton'
+import PrimaryButton from '../../../../../../components/buttons/PrimaryButton'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/batch/$batchId/',

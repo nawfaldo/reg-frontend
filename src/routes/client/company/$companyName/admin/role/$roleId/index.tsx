@@ -1,19 +1,19 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-import DetailHeader from '../../../../../../../component/headers/DetailHeader'
+import DetailHeader from '../../../../../../../components/headers/DetailHeader'
 import { usePermissions } from '../../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../../lib/api'
 import { queryKeys } from '../../../../../../../lib/query-keys'
+import Skeleton from '../../../../../../../components/Skeleton'
 
 export const Route = createFileRoute(
-  '/client/company/$companyName/member/role/$roleId/',
+  '/client/company/$companyName/admin/role/$roleId/',
 )({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { companyName, roleId } = useParams({ from: '/client/company/$companyName/member/role/$roleId/' })
+  const { companyName, roleId } = useParams({ from: '/client/company/$companyName/admin/role/$roleId/' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { hasPermission } = usePermissions(companyName)
@@ -55,7 +55,7 @@ function RouteComponent() {
       if (companyData?.company?.id) {
         queryClient.invalidateQueries({ queryKey: queryKeys.company.roles(companyData.company.id) });
       }
-      navigate({ to: '/client/company/$companyName/member/role', params: { companyName } });
+      navigate({ to: '/client/company/$companyName/admin/role', params: { companyName } });
     },
     onError: (err: Error) => {
       alert(err.message);
@@ -63,7 +63,7 @@ function RouteComponent() {
   });
 
   const handleDelete = () => {
-    if (!hasPermission('member:role:delete')) {
+    if (!hasPermission('admin:role:delete')) {
       alert('Anda tidak memiliki izin untuk menghapus peran');
       return;
     }
@@ -73,23 +73,19 @@ function RouteComponent() {
   }
   
   const handleEdit = () => {
-    if (!hasPermission('member:role:update')) {
+    if (!hasPermission('admin:role:update')) {
       alert('Anda tidak memiliki izin untuk mengubah peran');
       return;
     }
-    navigate({ to: '/client/company/$companyName/member/role/$roleId/edit', params: { companyName, roleId } });
+    navigate({ to: '/client/company/$companyName/admin/role/$roleId/edit', params: { companyName, roleId } });
   }
 
-  if (isLoadingCompany || isLoadingRole) {
-    return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  const isLoading = isLoadingCompany || isLoadingRole;
+  const role = roleData?.role;
+  const permissions = role?.permissions || [];
 
-  // Check permission to view role
-  if (!hasPermission('member:role:view')) {
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('admin:role:view')) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -99,13 +95,72 @@ function RouteComponent() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Peran"
+          userName={undefined}
+          handleDelete={undefined}
+          handleEdit={undefined}
+          isLoading={true}
+          isLoadingUserName={true}
+        />
+        
+        <div className="space-y-6">
+          {/* Name Input Skeleton */}
+          <div>
+            <Skeleton width={60} height={20} className="mb-2" />
+            <Skeleton width={400} height={36} borderRadius={0} />
+          </div>
+          
+          {/* Permissions Table Skeleton */}
+          <div>
+            <Skeleton width={80} height={20} className="mb-2" />
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <colgroup>
+                  <col className="w-[250px]" />
+                  <col className="w-auto" />
+                </colgroup>
+                
+                <thead>
+                  <tr className="border border-gray-200 bg-gray-100">
+                    <th className="text-left py-3 pl-5 pr-1 text-sm font-medium text-black">Nama</th>
+                    <th className="text-left py-3 pl-1 pr-2 text-sm font-medium text-black">Deskripsi</th>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                      <td className="pl-5 pr-1 py-3">
+                        <Skeleton width={120} height={16} />
+                      </td>
+                      <td className="pl-1 pr-2 py-3">
+                        <Skeleton width={200} height={16} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <DetailHeader
-          title="Detail Peran"
+          title="Lihat Peran"
+          userName={undefined}
           handleDelete={handleDelete}
           handleEdit={handleEdit}
+          isLoading={false}
+          isLoadingUserName={false}
         />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Error: {error.message}</p>
@@ -114,16 +169,16 @@ function RouteComponent() {
     );
   }
 
-  const role = roleData?.role;
-  const permissions = role?.permissions || [];
-
   if (!role) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
         <DetailHeader
-          title="Detail Peran"
+          title="Lihat Peran"
+          userName={undefined}
           handleDelete={handleDelete}
           handleEdit={handleEdit}
+          isLoading={false}
+          isLoadingUserName={false}
         />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Role not found</p>
@@ -135,9 +190,12 @@ function RouteComponent() {
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader
-        title={`Lihat Peran: ${role.name}`}
-        handleDelete={hasPermission('member:role:delete') ? handleDelete : undefined}
-        handleEdit={hasPermission('member:role:update') ? handleEdit : undefined}
+        title="Lihat Peran"
+        userName={role.name}
+        handleDelete={hasPermission('admin:role:delete') ? handleDelete : undefined}
+        handleEdit={hasPermission('admin:role:update') ? handleEdit : undefined}
+        isLoading={false}
+        isLoadingUserName={false}
       />
       
       <div className="space-y-6">

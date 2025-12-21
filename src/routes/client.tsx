@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Star, Home, User } from "lucide-react";
 import { server } from "../lib/api";
 import { queryKeys } from "../lib/query-keys";
+import Skeleton from "../components/Skeleton";
 
 export const Route = createFileRoute("/client")({
   beforeLoad: async ({ location }) => {
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/client")({
 });
 
 function ClientLayout() {
-  const { data: userData } = useQuery({
+  const { data: userData, isLoading } = useQuery({
     queryKey: queryKeys.me,
     queryFn: async () => {
       const { data, error } = await server.api.me.get();
@@ -40,7 +41,7 @@ function ClientLayout() {
 
   return (
     <div className="flex h-screen bg-white">
-      <aside className="w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-6b">
+      <aside className="w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center">
         <Star className="m-3 w-6 h-6 text-gray-900" />
         <Link
           to="/client/companies"
@@ -49,24 +50,30 @@ function ClientLayout() {
         >
           <Home className="w-[22px] h-[22px]" />
         </Link>
-        <Link
-          to="/client/profile"
-          search={{
-            success: undefined,
-          }}
-          className="p-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          title="Profile"
-        >
-          {userImage ? (
-            <img
-              src={userImage}
-              alt={user?.name || "Profile"}
-              className="w-[22px] h-[22px] rounded-lg"
-            />
-          ) : (
-            <User className="w-[22px] h-[22px] text-gray-600" />
-          )}
-        </Link>
+        {isLoading ? (
+          <div className="p-3">
+            <Skeleton width={22} height={22} borderRadius={8} />
+          </div>
+        ) : (
+          <Link
+            to="/client/profile"
+            search={{
+              success: undefined,
+            }}
+            className="p-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Profile"
+          >
+            {userImage ? (
+              <img
+                src={userImage}
+                alt={user?.name || "Profile"}
+                className="w-[22px] h-[22px] rounded-lg"
+              />
+            ) : (
+              <User className="w-[22px] h-[22px] text-gray-600" />
+            )}
+          </Link>
+        )}
       </aside>
       <main className="flex-1 overflow-auto">
         <Outlet />

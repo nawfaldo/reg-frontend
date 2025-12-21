@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import CreateHeader from '../../../component/headers/CreateHeader'
+import CreateHeader from '../../../components/headers/CreateHeader'
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Home, Camera } from 'lucide-react'
@@ -84,7 +84,8 @@ function RouteComponent() {
     <div className="px-6 pt-1 h-full bg-white">
       <CreateHeader
         title="Buat Perusahaan" 
-        createHandle={handleCreate} 
+        createHandle={handleCreate}
+        isPending={createMutation.isPending}
       />
 
       {error && (

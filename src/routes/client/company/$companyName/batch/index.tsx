@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Eye, Pencil, Search } from 'lucide-react'
 import { server } from '../../../../../lib/api'
 import { queryKeys } from '../../../../../lib/query-keys'
-import PrimaryButton from '../../../../../component/buttons/PrimaryButton'
+import PrimaryButton from '../../../../../components/buttons/PrimaryButton'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/client/company/$companyName/batch/')({

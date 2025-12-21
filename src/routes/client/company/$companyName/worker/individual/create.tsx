@@ -1,5 +1,5 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
-import CreateHeader from '../../../../../../component/headers/CreateHeader'
+import CreateHeader from '../../../../../../components/headers/CreateHeader'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'

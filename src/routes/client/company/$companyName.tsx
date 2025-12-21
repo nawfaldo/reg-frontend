@@ -1,9 +1,10 @@
 import { createFileRoute, Outlet, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { User, Settings, Building2, Loader2, MapPin, Pickaxe, Bean, Tractor } from 'lucide-react'
+import { User, Settings, Building2, MapPin, Pickaxe, Bean, Tractor } from 'lucide-react'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { server } from '../../../lib/api'
 import { queryKeys } from '../../../lib/query-keys'
+import Skeleton from '../../../components/Skeleton'
 
 export const Route = createFileRoute('/client/company/$companyName')({
   component: RouteComponent,
@@ -14,7 +15,7 @@ function RouteComponent() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
-    queryFn: async () => {
+    queryFn: async () => {      
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
       if (error) throw error;
       return data;
@@ -27,9 +28,20 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="flex h-screen bg-[#FAF9F6]">
-        <div className="w-64 bg-[#FAF9F6] border-r border-gray-200 p-4 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        </div>
+        <aside className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
+          <nav className="flex-1 space-y-2 px-4 pt-3">
+          <div className="flex items-center gap-3 mb-5">
+                <Skeleton borderRadius={8} width={20} height={20} />
+                <Skeleton width={80} height={16} />
+          </div>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center gap-3 mb-5">
+                <Skeleton circle width={20} height={20} />
+                <Skeleton width={80} height={16} />
+              </div>
+            ))}
+          </nav>
+        </aside>
         <main className="flex-1 overflow-auto">
           <Outlet />
         </main>
@@ -107,27 +119,27 @@ function RouteComponent() {
           </Link>
 
           {hasAnyMemberPermission() && (
-            hasPermission('member:user:view') ? (
+            hasPermission('admin:user:view') ? (
               <Link
-                to="/client/company/$companyName/member/user"
+                to="/client/company/$companyName/admin/user"
                 params={{ companyName: company.name }}
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
                 <User className="w-[20px] h-[20px]" />
                 <span>Admin</span>
               </Link>
-            ) : hasPermission('member:role:view') ? (
+            ) : hasPermission('admin:role:view') ? (
               <Link
-                to="/client/company/$companyName/member/role"
+                to="/client/company/$companyName/admin/role"
                 params={{ companyName: company.name }}
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
                 <User className="w-[20px] h-[20px]" />
                 <span>Admin</span>
               </Link>
-            ) : hasPermission('member:permission:view') ? (
+            ) : hasPermission('admin:permission:view') ? (
               <Link
-                to="/client/company/$companyName/member/permission"
+                to="/client/company/$companyName/admin/permission"
                 params={{ companyName: company.name }}
                 className="flex items-center gap-3 text-sm text-black mb-5"
               >
