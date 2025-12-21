@@ -2614,5 +2614,6 @@ declare const app: Elysia<"", {
     standaloneSchema: {};
     response: {};
 }>;
+declare const _default: any;
+export default _default;
 export type App = typeof app;
-export {};
