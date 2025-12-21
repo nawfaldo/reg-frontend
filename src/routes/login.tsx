@@ -44,7 +44,7 @@ function Login() {
     setIsLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${import.meta.env.VITE_WEBSITE_URL}/client/dashboard`,
+      callbackURL: `${import.meta.env.VITE_WEBSITE_URL}/client/companies`,
     });
   };
 
