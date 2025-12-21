@@ -8,6 +8,8 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
+import Skeleton from '../../../../../../components/Skeleton'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 // Fix icon marker bug di Leaflet + React
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
@@ -31,9 +33,10 @@ function RouteComponent() {
   const { companyName, landId } = useParams({ from: '/client/company/$companyName/geo-tag/$landId/' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions(companyName)
 
   // Fetch company data to get companyId
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -43,7 +46,7 @@ function RouteComponent() {
   });
 
   // Fetch land data
-  const { data: landData, isLoading, error } = useQuery({
+  const { data: landData, isLoading: isLoadingLand, error } = useQuery({
     queryKey: companyData?.company?.id ? queryKeys.company.landById(companyData.company.id, landId) : ['land', landId],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
@@ -55,6 +58,8 @@ function RouteComponent() {
   })
 
   const land = landData?.land
+  const isLoading = isLoadingCompany || isLoadingLand
+  const isLoadingLandName = isLoadingLand || !land
 
   // Check deforestation mutation
   const checkDeforestationMutation = useMutation({
@@ -189,26 +194,98 @@ function GeoJSONLayer({ data }: { data: any }) {
 }
 
   const handleEdit = () => {
+    if (!hasPermission('land:update')) {
+      alert('Anda tidak memiliki izin untuk mengubah lahan');
+      return;
+    }
     navigate({ to: '/client/company/$companyName/geo-tag/$landId/edit', params: { companyName, landId } })
   }
 
   const handleDelete = () => {
+    if (!hasPermission('land:delete')) {
+      alert('Anda tidak memiliki izin untuk menghapus lahan');
+      return;
+    }
     if (confirm('Apakah Anda yakin ingin menghapus lahan ini?')) {
       deleteMutation.mutate();
     }
   }
 
-  if (isLoading || !companyData) {
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('land:view')) {
     return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk melihat detail lahan</p>
+        </div>
       </div>
-    )
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Lahan"
+          userName={undefined}
+          handleDelete={undefined}
+          handleEdit={undefined}
+          isLoading={true}
+          isLoadingUserName={true}
+        />
+        
+        <div className="space-y-6">
+          {/* Land Information Skeleton */}
+          <div className="w-[400px] space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Nama</label>
+              <Skeleton width={200} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Lokasi</label>
+              <Skeleton width={250} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Luas Area (Hektar)</label>
+              <Skeleton width={100} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Latitude</label>
+              <Skeleton width={120} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Longitude</label>
+              <Skeleton width={120} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Bebas Deforestasi</label>
+              <Skeleton width={60} height={16} />
+            </div>
+          </div>
+
+          {/* Map Skeleton */}
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">
+              Peta Area Lahan
+            </label>
+            <Skeleton width={800} height={500} borderRadius={0} />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !land) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Lahan"
+          userName={undefined}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+          isLoading={false}
+          isLoadingUserName={false}
+        />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Error: {(error as Error)?.message || 'Lahan tidak ditemukan'}</p>
         </div>
@@ -228,9 +305,12 @@ function GeoJSONLayer({ data }: { data: any }) {
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader 
-        title={`Lihat Lahan: ${land.name}`} 
-        handleDelete={handleDelete} 
-        handleEdit={handleEdit} 
+        title="Lihat Lahan"
+        userName={land.name}
+        handleDelete={hasPermission('land:delete') ? handleDelete : undefined} 
+        handleEdit={hasPermission('land:update') ? handleEdit : undefined}
+        isLoading={false}
+        isLoadingUserName={false}
       />
 
       <div className="space-y-6">

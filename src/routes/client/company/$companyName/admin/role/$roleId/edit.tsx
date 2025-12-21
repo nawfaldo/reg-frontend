@@ -6,7 +6,7 @@ import { usePermissions } from '../../../../../../../hooks/usePermissions'
 import { server } from '../../../../../../../lib/api'
 import { queryKeys } from '../../../../../../../lib/query-keys'
 import SkeletonInput from '../../../../../../../components/inputs/SkeletonInput'
-import SkeletonDropdown from '../../../../../../../components/inputs/SkeletonDropdown'
+import GroupedSkeletonDropdown from '../../../../../../../components/inputs/GroupedSkeletonDropdown'
 
 export const Route = createFileRoute('/client/company/$companyName/admin/role/$roleId/edit')({
   component: RouteComponent,
@@ -146,7 +146,7 @@ function RouteComponent() {
           />
           
           {/* Permissions Select Skeleton */}
-          <SkeletonDropdown
+          <GroupedSkeletonDropdown
             label="Perizinan"
             placeholder="Pilih izin"
             items={[]}
@@ -205,7 +205,7 @@ function RouteComponent() {
         />
 
         {/* Permissions Select */}
-        <SkeletonDropdown
+        <GroupedSkeletonDropdown
           label="Perizinan"
           placeholder="Pilih izin"
           items={permissions.map((p: any) => ({ id: p.id, name: p.name, desc: p.desc }))}

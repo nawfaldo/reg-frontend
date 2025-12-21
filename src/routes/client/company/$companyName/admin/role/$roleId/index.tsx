@@ -108,15 +108,19 @@ function RouteComponent() {
         />
         
         <div className="space-y-6">
-          {/* Name Input Skeleton */}
+          {/* Name Skeleton */}
           <div>
-            <Skeleton width={60} height={20} className="mb-2" />
-            <Skeleton width={400} height={36} borderRadius={0} />
+            <label className="block text-sm font-medium text-black mb-2">
+              Name
+            </label>
+            <Skeleton width={200} height={16} />
           </div>
           
           {/* Permissions Table Skeleton */}
           <div>
-            <Skeleton width={80} height={20} className="mb-2" />
+            <label className="block text-sm font-medium text-black mb-2">
+              Perizinan
+            </label>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <colgroup>
@@ -199,17 +203,12 @@ function RouteComponent() {
       />
       
       <div className="space-y-6">
-        {/* Name Input */}
+        {/* Name */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
             Name
           </label>
-          <input
-            type="text"
-            value={role.name}
-            readOnly
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
+          <p className="text-sm text-black">{role.name}</p>
         </div>
 
         {/* Permissions Table */}

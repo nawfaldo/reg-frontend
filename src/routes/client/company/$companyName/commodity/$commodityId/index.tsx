@@ -3,7 +3,8 @@ import DetailHeader from '../../../../../../components/headers/DetailHeader'
 import { queryKeys } from '../../../../../../lib/query-keys'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
-import { Loader2 } from 'lucide-react'
+import Skeleton from '../../../../../../components/Skeleton'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/commodity/$commodityId/',
@@ -15,9 +16,10 @@ function RouteComponent() {
   const { companyName, commodityId } = useParams({ from: '/client/company/$companyName/commodity/$commodityId/' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions(companyName)
 
   // Fetch company data to get companyId
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -27,7 +29,7 @@ function RouteComponent() {
   });
 
   // Fetch commodity data
-  const { data: commodityData, isLoading, error } = useQuery({
+  const { data: commodityData, isLoading: isLoadingCommodity, error } = useQuery({
     queryKey: companyData?.company?.id ? queryKeys.company.commodityById(companyData.company.id, commodityId) : ['commodity', commodityId],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
@@ -63,39 +65,146 @@ function RouteComponent() {
   });
 
   const handleEdit = () => {
+    if (!hasPermission('commodity:update')) {
+      alert('Anda tidak memiliki izin untuk mengubah komoditas');
+      return;
+    }
     navigate({ to: '/client/company/$companyName/commodity/$commodityId/edit' as any, params: { companyName, commodityId } as any })
   }
 
   const handleDelete = () => {
+    if (!hasPermission('commodity:delete')) {
+      alert('Anda tidak memiliki izin untuk menghapus komoditas');
+      return;
+    }
     if (confirm('Apakah Anda yakin ingin menghapus komoditas ini?')) {
       deleteMutation.mutate();
     }
   }
 
-  if (isLoading || !companyData) {
+  const isLoading = isLoadingCompany || isLoadingCommodity;
+  const isLoadingCommodityName = isLoadingCommodity || !commodity;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('commodity:view')) {
     return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk melihat detail komoditas</p>
+        </div>
       </div>
-    )
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Komoditas"
+          userName={undefined}
+          handleDelete={undefined}
+          handleEdit={undefined}
+          isLoading={true}
+          isLoadingUserName={isLoadingCommodityName}
+        />
+        
+        <div className="space-y-6">
+          {/* Commodity Information Skeleton */}
+          <div className="w-[400px] space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">
+                Nama Komoditas
+              </label>
+              <Skeleton width={200} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">
+                Kode Komoditas
+              </label>
+              <Skeleton width={150} height={16} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">
+                Jumlah Batch
+              </label>
+              <Skeleton width={60} height={16} />
+            </div>
+          </div>
+
+          {/* Batches Table Skeleton */}
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">
+              Daftar Batch
+            </label>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <colgroup>
+                  <col className="w-[200px]" />
+                  <col className="w-[150px]" />
+                  <col className="w-[150px]" />
+                  <col className="w-auto" />
+                </colgroup>
+                
+                <thead>
+                  <tr className="border border-gray-200 bg-gray-100">
+                    <th className="text-left py-3 pl-5 pr-1 text-sm font-medium text-black">Lot Code</th>
+                    <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Tanggal Panen</th>
+                    <th className="text-left py-3 pl-1 pr-1 text-sm font-medium text-black">Total (Kg)</th>
+                    <th className="py-3"></th>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                      <td className="pl-5 pr-1 py-3">
+                        <Skeleton width={120} height={16} />
+                      </td>
+                      <td className="pl-1 pr-1 py-3">
+                        <Skeleton width={100} height={16} />
+                      </td>
+                      <td className="pl-1 pr-1 py-3">
+                        <Skeleton width={80} height={16} />
+                      </td>
+                      <td className="py-3"></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !commodity) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
+        <DetailHeader
+          title="Lihat Komoditas"
+          userName={undefined}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+          isLoading={false}
+          isLoadingUserName={false}
+        />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Error: {(error as Error)?.message || 'Komoditas tidak ditemukan'}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="px-6 pt-1 h-full bg-white">
       <DetailHeader 
-        title={`Lihat Komoditas: ${commodity.name}`} 
-        handleDelete={handleDelete} 
-        handleEdit={handleEdit} 
+        title="Lihat Komoditas"
+        userName={commodity.name}
+        handleDelete={hasPermission('commodity:delete') ? handleDelete : undefined} 
+        handleEdit={hasPermission('commodity:update') ? handleEdit : undefined}
+        isLoading={false}
+        isLoadingUserName={false}
       />
 
       <div className="space-y-6">

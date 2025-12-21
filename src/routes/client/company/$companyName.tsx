@@ -85,22 +85,26 @@ function RouteComponent() {
 
         {/* Menu Items */}
         <nav className="flex-1 space-y-2 px-4 pt-6">
-        <Link
-            to="/client/company/$companyName/worker/group"
-            params={{ companyName: company.name }}
-            className="flex items-center gap-3 text-sm text-black mb-5"
-          >
-            <Pickaxe className="w-[17px] h-[17px]" />
-            <span>Pekerja</span>
-          </Link>
-          <Link
-            to="/client/company/$companyName/geo-tag"
-            params={{ companyName: company.name }}
-            className="flex items-center gap-3 text-sm text-black mb-5"
-          >
-            <MapPin className="w-[20px] h-[20px]" />
-            <span>Lahan</span>
-          </Link>
+          {(hasPermission('worker:group:view') || hasPermission('worker:individual:view')) && (
+            <Link
+              to="/client/company/$companyName/worker/group"
+              params={{ companyName: company.name }}
+              className="flex items-center gap-3 text-sm text-black mb-5"
+            >
+              <Pickaxe className="w-[17px] h-[17px]" />
+              <span>Pekerja</span>
+            </Link>
+          )}
+          {hasPermission('land:view') && (
+            <Link
+              to="/client/company/$companyName/geo-tag"
+              params={{ companyName: company.name }}
+              className="flex items-center gap-3 text-sm text-black mb-5"
+            >
+              <MapPin className="w-[20px] h-[20px]" />
+              <span>Lahan</span>
+            </Link>
+          )}
           <Link
             to="/client/company/$companyName/batch"
             params={{ companyName: company.name }}
@@ -109,14 +113,16 @@ function RouteComponent() {
             <Tractor className="w-[20px] h-[20px]" />
             <span>Produksi</span>
           </Link>
-          <Link
-            to="/client/company/$companyName/commodity"
-            params={{ companyName: company.name }}
-            className="flex items-center gap-3 text-sm text-black mb-5"
-          >
-            <Bean className="w-[18px] h-[18px]" />
-            <span>Komoditas</span>
-          </Link>
+          {hasPermission('commodity:view') && (
+            <Link
+              to="/client/company/$companyName/commodity"
+              params={{ companyName: company.name }}
+              className="flex items-center gap-3 text-sm text-black mb-5"
+            >
+              <Bean className="w-[18px] h-[18px]" />
+              <span>Komoditas</span>
+            </Link>
+          )}
 
           {hasAnyMemberPermission() && (
             hasPermission('admin:user:view') ? (

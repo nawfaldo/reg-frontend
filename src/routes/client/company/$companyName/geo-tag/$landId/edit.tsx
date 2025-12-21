@@ -5,7 +5,10 @@ import GeoMapEditor from '../../../../../../components/GeoMapEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
-import { Loader2, TriangleAlert, Search } from 'lucide-react'
+import { TriangleAlert, Search, Loader2 } from 'lucide-react'
+import SkeletonInput from '../../../../../../components/inputs/SkeletonInput'
+import Skeleton from '../../../../../../components/Skeleton'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/geo-tag/$landId/edit',
@@ -17,6 +20,7 @@ function RouteComponent() {
   const { companyName, landId } = useParams({ from: '/client/company/$companyName/geo-tag/$landId/edit' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions(companyName)
 
   const [name, setName] = useState("")
   const [areaHectares, setAreaHectares] = useState<number>(0)
@@ -32,7 +36,7 @@ function RouteComponent() {
   const [showSuggestions, setShowSuggestions] = useState(false)
 
   // Fetch company data
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -54,6 +58,8 @@ function RouteComponent() {
   })
 
   const land = landData?.land
+  const isLoading = isLoadingCompany || isLoadingLand
+  const isLoadingLandName = isLoadingLand || !land
 
   // Pre-fill form with existing data
   useEffect(() => {
@@ -297,10 +303,76 @@ function RouteComponent() {
     });
   }
 
-  if (!companyData || isLoadingLand) {
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('land:update')) {
     return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk mengubah lahan</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <EditHeader
+          title="Ubah Lahan"
+          userName={undefined}
+          saveHandle={handleSave}
+          isPending={false}
+          isLoadingUserName={true}
+        />
+        
+        <div className="space-y-6">
+          {/* Name Input Skeleton */}
+          <SkeletonInput
+            label="Nama Lahan"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+          
+          {/* GeoMapEditor Skeleton */}
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">
+              Gambar Area Lahan
+            </label>
+            <Skeleton width={1000} height={500} borderRadius={0} />
+          </div>
+          
+          {/* Read-only fields skeleton */}
+          <SkeletonInput
+            label="Luas Area (Hektar)"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+          <SkeletonInput
+            label="Latitude"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+          <SkeletonInput
+            label="Longitude"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+          <SkeletonInput
+            label="Lokasi"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+        </div>
       </div>
     );
   }
@@ -308,6 +380,13 @@ function RouteComponent() {
   if (!land) {
     return (
       <div className="px-6 pt-1 h-full bg-white">
+        <EditHeader
+          title="Ubah Lahan"
+          userName={undefined}
+          saveHandle={handleSave}
+          isPending={false}
+          isLoadingUserName={false}
+        />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Lahan tidak ditemukan</p>
         </div>
@@ -317,7 +396,13 @@ function RouteComponent() {
 
   return (
   <div className="px-6 pt-1 h-full bg-white">
-      <EditHeader title={`Ubah Lahan: ${land.name}`} saveHandle={handleSave} />
+      <EditHeader
+        title="Ubah Lahan"
+        userName={land.name}
+        saveHandle={handleSave}
+        isPending={updateMutation.isPending}
+        isLoadingUserName={false}
+      />
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -327,18 +412,14 @@ function RouteComponent() {
 
       <div className="space-y-6">
         {/* Name Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Nama Lahan
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nama Lahan"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
+        <SkeletonInput
+          label="Nama Lahan"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nama Lahan"
+          isLoading={false}
+          wrapperClassName="w-[400px]"
+        />
 
         {/* GeoMapEditor */}
         <div>

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
-import { Loader2 } from 'lucide-react'
+import SkeletonInput from '../../../../../../components/inputs/SkeletonInput'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/commodity/$commodityId/edit',
@@ -16,13 +17,14 @@ function RouteComponent() {
   const { companyName, commodityId } = useParams({ from: '/client/company/$companyName/commodity/$commodityId/edit' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions(companyName)
 
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   // Fetch company data
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -98,17 +100,65 @@ function RouteComponent() {
     });
   }
 
-  if (!companyData || isLoadingCommodity) {
+  const isLoading = isLoadingCompany || isLoadingCommodity;
+  const commodity = commodityData?.commodity;
+  const isLoadingCommodityName = isLoadingCommodity || !commodity;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('commodity:update')) {
     return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk mengubah komoditas</p>
+        </div>
       </div>
     );
   }
 
-  if (!commodityData?.commodity) {
+  if (isLoading) {
     return (
-      <div className="px-6 pt-1 h-full bg-white">
+      <div className='px-6 pt-1 bg-white h-full'>
+        <EditHeader
+          title="Ubah Komoditas"
+          userName={undefined}
+          saveHandle={handleSave}
+          isPending={false}
+          isLoadingUserName={isLoadingCommodityName}
+        />
+        
+        <div className="space-y-6">
+          {/* Name Input Skeleton */}
+          <SkeletonInput
+            label="Nama Komoditas"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+          
+          {/* Code Input Skeleton */}
+          <SkeletonInput
+            label="Kode Komoditas"
+            value=""
+            onChange={() => {}}
+            isLoading={true}
+            wrapperClassName="w-[400px]"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!commodity) {
+    return (
+      <div className='px-6 pt-1 bg-white'>
+        <EditHeader
+          title="Ubah Komoditas"
+          userName={undefined}
+          saveHandle={handleSave}
+          isPending={false}
+          isLoadingUserName={false}
+        />
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Komoditas tidak ditemukan</p>
         </div>
@@ -116,11 +166,15 @@ function RouteComponent() {
     );
   }
 
-  const commodity = commodityData.commodity;
-
   return (
     <div className='px-6 pt-1 bg-white'>
-      <EditHeader title={`Edit Komoditas: ${commodity.name}`} saveHandle={handleSave} />
+      <EditHeader 
+        title="Ubah Komoditas"
+        userName={commodity.name}
+        saveHandle={handleSave} 
+        isPending={updateMutation.isPending}
+        isLoadingUserName={false}
+      />
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -130,32 +184,24 @@ function RouteComponent() {
 
       <div className="space-y-6">
         {/* Name Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Nama Komoditas
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nama Komoditas"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
+        <SkeletonInput
+          label="Nama Komoditas"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nama Komoditas"
+          isLoading={false}
+          wrapperClassName="w-[400px]"
+        />
 
         {/* Code Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Kode Komoditas
-          </label>
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Kode Komoditas"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
+        <SkeletonInput
+          label="Kode Komoditas"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="Kode Komoditas"
+          isLoading={false}
+          wrapperClassName="w-[400px]"
+        />
       </div>
     </div>
   )

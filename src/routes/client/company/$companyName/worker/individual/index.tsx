@@ -1,10 +1,12 @@
 import { Link, useParams } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2, Eye, Pencil } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
 import WorkerHeader from '../../../../../../components/headers/WorkerHeader'
+import Skeleton from '../../../../../../components/Skeleton'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/worker/individual/',
@@ -14,6 +16,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { companyName } = useParams({ from: '/client/company/$companyName/worker/individual/' })
+  const { hasPermission } = usePermissions(companyName)
 
   const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
@@ -35,10 +38,15 @@ function RouteComponent() {
     enabled: !!companyData?.company?.id,
   });
 
-  if (isLoadingCompany || isLoadingFarmers) {
+  const isLoading = isLoadingCompany || isLoadingFarmers;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('worker:individual:view')) {
     return (
-      <div className="px-6 pt-6 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="px-6 pt-6 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk melihat daftar pekerja</p>
+        </div>
       </div>
     );
   }
@@ -57,7 +65,7 @@ function RouteComponent() {
 
   return (
     <div className="px-6 pt-1 h-full bg-white">
-      <WorkerHeader />
+      <WorkerHeader isLoading={isLoading} />
 
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
@@ -84,7 +92,35 @@ function RouteComponent() {
           </thead>
           
           <tbody>
-            {farmers.length === 0 ? (
+            {isLoading ? (
+              // Show 3 skeleton rows while loading
+              Array.from({ length: 3 }).map((_, index) => (
+                <tr key={`skeleton-${index}`} className="border-b border-gray-200">
+                  <td className="py-3 pl-5 pr-1">
+                    <Skeleton width={120} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-1">
+                    <Skeleton width={100} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-1">
+                    <Skeleton width={100} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-1">
+                    <Skeleton width={150} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-1">
+                    <Skeleton width={100} height={16} />
+                  </td>
+                  <td className="py-3 pl-1 pr-2">
+                    <div className="flex items-center gap-2">
+                      <Skeleton width={16} height={16} circle />
+                      <Skeleton width={16} height={16} circle />
+                    </div>
+                  </td>
+                  <td className="py-3"></td>
+                </tr>
+              ))
+            ) : farmers.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-8 px-2 text-center text-gray-500">
                   Tidak ada pekerja
@@ -114,24 +150,26 @@ function RouteComponent() {
                   </td>
                   <td className="py-3 pl-1 pr-2">
                     <div className="flex items-center gap-2">
-                      <Link
-                        to={"/client/company/$companyName/worker/individual/$farmerId" as any}
-                        params={{ companyName, farmerId: farmer.id } as any}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
-                        title="Lihat"
-                      >
-                        <Eye className="w-4 h-4 text-black" />
-                      </Link>
-                      <button
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
-                        title="Edit"
-                        onClick={() => {
-                          // TODO: Implement edit farmer
-                          console.log('Edit farmer:', farmer.id);
-                        }}
-                      >
-                        <Pencil className="w-4 h-4 text-black" />
-                      </button>
+                      {hasPermission('worker:individual:view') && (
+                        <Link
+                          to={"/client/company/$companyName/worker/individual/$farmerId" as any}
+                          params={{ companyName, farmerId: farmer.id } as any}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                          title="Lihat"
+                        >
+                          <Eye className="w-4 h-4 text-black" />
+                        </Link>
+                      )}
+                      {hasPermission('worker:individual:update') && (
+                        <Link
+                          to={"/client/company/$companyName/worker/individual/$farmerId/edit" as any}
+                          params={{ companyName, farmerId: farmer.id } as any}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil className="w-4 h-4 text-black" />
+                        </Link>
+                      )}
                     </div>
                   </td>
                   <td className="py-3"></td>

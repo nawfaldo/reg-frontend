@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { server } from '../../../../../../lib/api'
 import { queryKeys } from '../../../../../../lib/query-keys'
-import { Loader2, ChevronDown, X } from 'lucide-react'
+import SkeletonInput from '../../../../../../components/inputs/SkeletonInput'
+import SkeletonDropdown from '../../../../../../components/inputs/SkeletonDropdown'
+import { usePermissions } from '../../../../../../hooks/usePermissions'
 
 export const Route = createFileRoute(
   '/client/company/$companyName/worker/individual/create',
@@ -16,6 +18,7 @@ function RouteComponent() {
   const { companyName } = useParams({ from: '/client/company/$companyName/worker/individual/create' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions(companyName)
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -23,11 +26,10 @@ function RouteComponent() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [address, setAddress] = useState('')
   const [selectedFarmerGroupIds, setSelectedFarmerGroupIds] = useState<string[]>([])
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Fetch company data
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
     queryKey: queryKeys.company.byName(companyName),
     queryFn: async () => {
       const { data, error } = await (server.api.company.name as any)({ name: companyName }).get();
@@ -37,7 +39,7 @@ function RouteComponent() {
   });
 
   // Fetch farmer groups for dropdown
-  const { data: farmerGroupsData } = useQuery({
+  const { data: farmerGroupsData, isLoading: isLoadingGroups } = useQuery({
     queryKey: companyData?.company?.id ? queryKeys.company.farmerGroups(companyData.company.id) : ['farmerGroups'],
     queryFn: async () => {
       if (!companyData?.company?.id) return null;
@@ -117,36 +119,49 @@ function RouteComponent() {
   }
 
   const farmerGroups = farmerGroupsData?.farmerGroups || [];
-  // Filter out already selected groups
-  const availableGroups = farmerGroups.filter((group: any) => 
-    !selectedFarmerGroupIds.includes(group.id)
-  );
-  
-  // Get selected group objects
-  const selectedGroupObjects = farmerGroups.filter((group: any) => selectedFarmerGroupIds.includes(group.id));
+  const isLoading = isLoadingCompany || isLoadingGroups;
+
+  // Wait for loading to complete before checking permissions
+  if (!isLoading && !hasPermission('worker:individual:create')) {
+    return (
+      <div className="px-6 pt-1 h-full bg-white">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Anda tidak memiliki izin untuk membuat pekerja</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddGroup = (groupId: string) => {
     if (!selectedFarmerGroupIds.includes(groupId)) {
       setSelectedFarmerGroupIds([...selectedFarmerGroupIds, groupId]);
     }
-    setIsDropdownOpen(false);
   }
 
   const handleRemoveGroup = (groupId: string) => {
     setSelectedFarmerGroupIds(selectedFarmerGroupIds.filter(id => id !== groupId));
   }
 
-  if (!companyData) {
+  if (isLoading) {
     return (
-      <div className="px-6 pt-1 h-full bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className='px-6 pt-1 bg-white'>
+        <CreateHeader title='Buat Pekerja' createHandle={handleCreate} isPending={false} />
+        
+        <div className="space-y-6">
+          <SkeletonInput label="Nama Awal" value="" onChange={() => {}} isLoading={true} wrapperClassName="w-[400px]" />
+          <SkeletonInput label="Nama Akhir" value="" onChange={() => {}} isLoading={true} wrapperClassName="w-[400px]" />
+          <SkeletonInput label="NIK" value="" onChange={() => {}} isLoading={true} wrapperClassName="w-[400px]" />
+          <SkeletonInput label="Nomor Telepon" value="" onChange={() => {}} isLoading={true} wrapperClassName="w-[400px]" />
+          <SkeletonInput label="Alamat" value="" onChange={() => {}} isLoading={true} wrapperClassName="w-[400px]" />
+          <SkeletonDropdown label="Kelompok (Opsional)" placeholder="Pilih kelompok" items={[]} selectedIds={[]} onAdd={() => {}} onRemove={() => {}} isLoading={true} isLoadingItems={true} />
+        </div>
       </div>
     );
   }
 
   return (
     <div className='px-6 pt-1 bg-white'>
-      <CreateHeader title='Buat Pekerja' createHandle={handleCreate} />
+      <CreateHeader title='Buat Pekerja' createHandle={handleCreate} isPending={createMutation.isPending} />
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -155,134 +170,23 @@ function RouteComponent() {
       )}
 
       <div className="space-y-6">
-        {/* First Name Input */}
+        <SkeletonInput label="Nama Awal" value={firstName} onChange={(e) => setFirstName(e.target.value)} isLoading={false} wrapperClassName="w-[400px]" />
+        <SkeletonInput label="Nama Akhir" value={lastName} onChange={(e) => setLastName(e.target.value)} isLoading={false} wrapperClassName="w-[400px]" />
+        <SkeletonInput label="NIK" value={nationalId} onChange={(e) => setNationalId(e.target.value)} isLoading={false} wrapperClassName="w-[400px]" />
+        <SkeletonInput label="Nomor Telepon" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} isLoading={false} wrapperClassName="w-[400px]" />
         <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Nama Awal
-          </label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Nama Awal"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
-
-        {/* Last Name Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Nama Akhir
-          </label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Nama Akhir"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
-
-        {/* National ID Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            NIK
-          </label>
-          <input
-            type="text"
-            value={nationalId}
-            onChange={(e) => setNationalId(e.target.value)}
-            placeholder="Nomor Induk Kependudukan"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
-
-        {/* Phone Number Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Nomor Telepon
-          </label>
-          <input
-            type="text"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="Nomor Telepon"
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white"
-          />
-        </div>
-
-        {/* Address Input */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Alamat
-          </label>
-          <textarea
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Alamat Lengkap"
-            rows={4}
-            className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white resize-none"
-          />
-        </div>
-
-        {/* Farmer Group Select */}
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">
-            Kelompok (Opsional)
-          </label>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-[400px] px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-white text-left flex items-center justify-between"
-            >
-              <span className="text-gray-400">
-                Pilih kelompok
-              </span>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {isDropdownOpen && (
-              <div className="absolute z-10 w-[400px] mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                {availableGroups.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-gray-500">Tidak ada kelompok tersedia</div>
-                ) : (
-                  availableGroups.map((group: any) => (
-                    <button
-                      key={group.id}
-                      type="button"
-                      onClick={() => handleAddGroup(group.id)}
-                      className="w-full px-3 py-2 text-sm text-left hover:bg-gray-100 transition-colors"
-                    >
-                      {group.name}
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
+          <label className="block text-sm font-bold text-black mb-3">Alamat</label>
+          <div className="w-[400px] border border-gray-300 focus-within:border-gray-900">
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Alamat Lengkap"
+              rows={4}
+              className="w-full px-3 py-2 focus:outline-none text-sm bg-transparent resize-none"
+            />
           </div>
-          
-          {/* Selected Groups Tags */}
-          {selectedGroupObjects.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {selectedGroupObjects.map((group: any) => (
-                <div
-                  key={group.id}
-                  className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 border border-gray-300 text-sm"
-                >
-                  <span className="text-black">{group.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveGroup(group.id)}
-                    className="text-gray-600 hover:text-black transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
+        <SkeletonDropdown label="Kelompok (Opsional)" placeholder="Pilih kelompok" items={farmerGroups.map((g: any) => ({ id: g.id, name: g.name }))} selectedIds={selectedFarmerGroupIds} onAdd={handleAddGroup} onRemove={handleRemoveGroup} isLoading={false} isLoadingItems={isLoadingGroups} />
       </div>
     </div>
   )
